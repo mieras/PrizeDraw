@@ -30,7 +30,10 @@ const POSTAL_CODE_PATTERN = /^\d{4}[A-Z]{2}$/;
 const REVEAL_DURATION_MS = 5000;
 
 function sanitizePostalCode(input: string) {
-  return input.toUpperCase().replace(/\s+/g, "").replace(/[^A-Z0-9]/g, "").slice(0, 6);
+  const cleaned = input.toUpperCase().replace(/\s+/g, "").replace(/[^A-Z0-9]/g, "");
+  const digits = cleaned.replace(/\D/g, "").slice(0, 4);
+  const letters = cleaned.replace(/\d/g, "").slice(0, 2);
+  return digits + letters;
 }
 
 export function App() {
@@ -127,7 +130,7 @@ export function App() {
                 className={styles.input}
                 value={postalCodeInput}
                 onChange={(event) => setPostalCodeInput(sanitizePostalCode(event.target.value))}
-                placeholder="1234AA"
+                placeholder="1234AB"
                 autoComplete="postal-code"
                 inputMode="text"
                 spellCheck={false}

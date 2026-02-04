@@ -12,80 +12,60 @@ const GOLD = ["#b8860b", "#ffd700", "#fff2b0"];
 
 type ColorMode = "gold" | "colorful";
 
-interface RibbonBurst {
+interface FallingRibbon {
   x: number;
   y: number;
   size: number;
   length: number;
-  scale: number;
-  depth: number;
-  speedX: number;
   speedY: number;
+  speedX: number;
   rotation: number;
   rotationSpeed: number;
   flip: number;
   flipSpeed: number;
   gradientColors: string[];
-  life: number;
-  fade: number;
-  gravity: number;
-  airDrag: number;
-  wind: number;
 }
 
-function createBurstParticles(
-  x: number,
-  y: number,
+function createFallingRibbons(
+  width: number,
+  height: number,
   amount: number,
   colorMode: ColorMode,
   baseSize: number,
   baseLength: number,
   speedMult: number
-): RibbonBurst[] {
-  const particles: RibbonBurst[] = [];
+): FallingRibbon[] {
+  const ribbons: FallingRibbon[] = [];
 
   for (let i = 0; i < amount; i++) {
-    const depth = 0.25 + Math.random() * 1.25;
-    const scale = depth;
-    const size = baseSize * depth * (0.15 + Math.random());
-    const length = baseLength * depth * (0.5 + Math.random());
-    const angle = Math.random() * Math.PI * 2;
-    const speed = (2 + Math.random() * 4) * speedMult * depth;
-
     const gradientColors =
       colorMode === "colorful"
         ? COLOR_PAIRS[Math.floor(Math.random() * COLOR_PAIRS.length)]!
         : GOLD;
 
-    particles.push({
-      x,
-      y,
-      size,
-      length,
-      scale,
-      depth,
-      speedX: Math.cos(angle) * speed,
-      speedY: Math.sin(angle) * speed,
+    ribbons.push({
+      x: Math.random() * width,
+      y: Math.random() * -height - baseLength * 2,
+      size: baseSize * (0.5 + Math.random()),
+      length: baseLength * (0.5 + Math.random()),
+      speedY: (1 + Math.random() * 2) * speedMult,
+      speedX: (Math.random() - 0.5) * 1,
       rotation: Math.random() * Math.PI * 2,
-      rotationSpeed: (Math.random() - 0.5) * 0.2 * depth,
+      rotationSpeed: 0.03 + Math.random() * 0.05,
       flip: 0,
       flipSpeed: 0.08 + Math.random() * 0.08,
       gradientColors: [...gradientColors],
-      life: 4,
-      fade: 0.015 + Math.random() * 0.015,
-      gravity: 0.06 + Math.random() * 0.04,
-      airDrag: 0.96 + Math.random() * 0.03,
-      wind: (Math.random() - 0.5) * 0.05,
     });
   }
 
-  return particles;
+  return ribbons;
 }
 
 export function Confetti({ colorMode = "gold" }: { colorMode?: ColorMode }) {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
-  const particlesRef = React.useRef<RibbonBurst[]>([]);
+  const ribbonsRef = React.useRef<FallingRibbon[]>([]);
   const rafRef = React.useRef<number>(0);
+  const dimensionsRef = React.useRef({ w: 0, h: 0, wCss: 0, hCss: 0 });
 
   React.useEffect(() => {
     const canvas = canvasRef.current;
@@ -94,15 +74,14 @@ export function Confetti({ colorMode = "gold" }: { colorMode?: ColorMode }) {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    let w = 0;
-    let h = 0;
-
     const resize = () => {
       const rect = canvas.getBoundingClientRect();
       const dpr = window.devicePixelRatio ?? 1;
-      w = canvas.width = Math.round(rect.width * dpr);
-      h = canvas.height = Math.round(rect.height * dpr);
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const w = Math.round(rect.width * dpr);
+      const h = Math.round(rect.height * dpr);
+      canvas.width = w;
+      canvas.height = h;
+      dimensionsRef.current = { w, h, wCss: rect.width, hCss: rect.height };
     };
 
     resize();
@@ -111,14 +90,12 @@ export function Confetti({ colorMode = "gold" }: { colorMode?: ColorMode }) {
     const baseSize = 10;
     const baseLength = 6;
     const speedMult = 1.5;
-    const amount = 80;
+    const amount = 100;
 
-    const centerX = canvas.getBoundingClientRect().width / 2;
-    const centerY = canvas.getBoundingClientRect().height / 2;
-
-    particlesRef.current = createBurstParticles(
-      centerX,
-      centerY,
+    const { wCss, hCss } = dimensionsRef.current;
+    ribbonsRef.current = createFallingRibbons(
+      wCss,
+      hCss,
       amount,
       colorMode,
       baseSize,
@@ -126,59 +103,56 @@ export function Confetti({ colorMode = "gold" }: { colorMode?: ColorMode }) {
       speedMult
     );
 
-    const drawParticle = (p: RibbonBurst) => {
-      if (p.life <= 0) return;
+    const drawRibbon = (r: FallingRibbon) => {
       ctx.save();
-      ctx.globalAlpha = Math.max(p.life * 0.9, 0);
-      ctx.translate(p.x, p.y);
-      ctx.rotate(p.rotation);
-      ctx.scale(p.scale * 0.8, p.scale * 0.8);
+      ctx.translate(r.x, r.y);
+      ctx.rotate(r.rotation);
+      const flipScale = Math.sin(r.flip);
 
-      const flipScale = Math.sin(p.flip);
-      const grad = ctx.createLinearGradient(-p.size, 0, p.size, 0);
-      if (p.gradientColors.length === 2) {
-        grad.addColorStop(0, p.gradientColors[0]!);
-        grad.addColorStop(1, p.gradientColors[1]!);
+      const grad = ctx.createLinearGradient(-r.size, 0, r.size, 0);
+      if (r.gradientColors.length === 2) {
+        grad.addColorStop(0, r.gradientColors[0]!);
+        grad.addColorStop(1, r.gradientColors[1]!);
       } else {
-        grad.addColorStop(0, p.gradientColors[0]!);
-        grad.addColorStop(0.5, p.gradientColors[1]!);
-        grad.addColorStop(1, p.gradientColors[2]!);
+        grad.addColorStop(0, r.gradientColors[0]!);
+        grad.addColorStop(0.5, r.gradientColors[1]!);
+        grad.addColorStop(1, r.gradientColors[2]!);
       }
 
       ctx.fillStyle = grad;
       ctx.beginPath();
-      ctx.moveTo(-p.size * flipScale, 0);
-      ctx.lineTo(p.size * flipScale, 0);
-      ctx.lineTo(p.size * flipScale, p.length);
-      ctx.lineTo(-p.size * flipScale, p.length);
+      ctx.moveTo(-r.size * flipScale, 0);
+      ctx.lineTo(r.size * flipScale, 0);
+      ctx.lineTo(r.size * flipScale, r.length);
+      ctx.lineTo(-r.size * flipScale, r.length);
       ctx.closePath();
       ctx.fill();
       ctx.restore();
     };
 
     const animate = () => {
+      const { w, h, wCss, hCss } = dimensionsRef.current;
       const dpr = window.devicePixelRatio ?? 1;
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, w, h);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      const particles = particlesRef.current;
-      let allDead = true;
+      const ribbons = ribbonsRef.current;
+      let allBelow = true;
 
-      for (const p of particles) {
-        p.x += p.speedX;
-        p.y += p.speedY;
-        p.speedX *= p.airDrag;
-        p.speedY = p.speedY * p.airDrag + p.gravity;
-        p.speedX += p.wind * p.depth;
-        p.rotation += p.rotationSpeed;
-        p.flip += p.flipSpeed;
-        p.life -= p.fade;
-        if (p.life > 0) allDead = false;
-        drawParticle(p);
+      for (const r of ribbons) {
+        r.y += r.speedY;
+        r.x += r.speedX;
+        r.rotation += r.rotationSpeed;
+        r.flip += r.flipSpeed;
+
+        if (r.y < hCss + r.length) {
+          allBelow = false;
+          drawRibbon(r);
+        }
       }
 
-      if (!allDead) {
+      if (!allBelow) {
         rafRef.current = requestAnimationFrame(animate);
       }
     };
