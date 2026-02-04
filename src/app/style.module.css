@@ -7,6 +7,7 @@
   justify-content: center;
   pointer-events: none;
   padding: 20px;
+  user-select: none;
 }
 
 .sceneFade {
@@ -68,7 +69,7 @@
 }
 
 .input {
-  
+  user-select: text;
   width: 10ch;
   height: var(--ds-core--button--height--container);
   border-radius: var(--generic-corners-corner-radius-default);
@@ -181,7 +182,7 @@ loadingPanel p {
 
 .resultPanel h2 {
   margin: 0 0 1rem 0;
-  font-size: clamp(1.9rem, 4vw, 3rem);
+  font-size: clamp(1.5rem, 14vw, 2.5rem);
   text-wrap: pretty;
 }
 
@@ -196,7 +197,8 @@ loadingPanel p {
 .resultImage {
   width: min(340px, 100%);
   /* aspect-ratio: 400 / 300; */
-  object-fit: cover;
+  max-height: 20vh;
+  object-fit: contain;
   border-radius: 20px;
 }
 
