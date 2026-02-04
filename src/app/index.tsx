@@ -4,6 +4,7 @@ import prizeManifest from "~/src/prizes/manifest.json";
 import { InfiniteCanvas } from "~/src/infinite-canvas";
 import type { MediaItem, PrizeManifestItem } from "~/src/infinite-canvas/types";
 import { PageLoader } from "~/src/loader";
+import { Confetti } from "./confetti";
 import { drawPrize, type DrawResult } from "./draw";
 import styles from "./style.module.css";
 
@@ -146,27 +147,36 @@ export function App() {
           </section>
         )}
 
-        {phase === "revealed" && drawResult && (
-          <section className={`${styles.resultPanel} ${styles.resultPlain}`} aria-live="polite">
-            <h2>Jouw prijs</h2>
-            <img className={styles.resultImage} src={drawResult.prize.url} alt={drawResult.prizeLabel} />
-            <p className={styles.resultPrize}>{drawResult.prizeLabel}</p>
-            {"omschrijvingKort" in drawResult.prize && drawResult.prize.omschrijvingKort ? (
-              <p className={styles.resultMeta}>{drawResult.prize.omschrijvingKort}</p>
-            ) : null}
-            {"uitslagTitle" in drawResult.prize && drawResult.prize.uitslagTitle && drawResult.prize.uitslagTitle !== "-" ? (
-              <p className={styles.resultMeta}>{drawResult.prize.uitslagTitle}</p>
-            ) : null}
-            <p className={styles.resultMeta}>
-              Postcode: <span className={styles.mono}>{drawResult.postalCode}</span>
-            </p>
-            <p className={styles.resultMeta}>
-              Ticketnummer: <span className={styles.mono}>{drawResult.ticketNumber}</span>
-            </p>
-            <button className={styles.button} type="button" onClick={handleReset}>
-              Opnieuw proberen
-            </button>
-          </section>
+        {phase === "revealed" && (
+          <>
+            <Confetti colorMode="gold" />
+            {drawResult && (
+              <section className={`${styles.resultPanel} ${styles.resultPlain}`} aria-live="polite">
+                <h2>Jouw prijs</h2>
+                <img className={styles.resultImage} src={drawResult.prize.url} alt={drawResult.prizeLabel} />
+                <h3 className={styles.resultPrize}>
+                  {drawResult.prizeLabel
+                    ? drawResult.prizeLabel.charAt(0).toUpperCase() + drawResult.prizeLabel.slice(1)
+                    : ""}
+                </h3>
+                {"uitslagTitle" in drawResult.prize && drawResult.prize.uitslagTitle && drawResult.prize.uitslagTitle !== "-" ? (
+                  <p className={styles.resultMeta}>{drawResult.prize.uitslagTitle}</p>
+                ) : null}
+                {"omschrijvingKort" in drawResult.prize && drawResult.prize.omschrijvingKort ? (
+                  <p className={styles.resultMeta}>{drawResult.prize.omschrijvingKort}</p>
+                ) : null}
+                <p className={styles.resultMeta}>
+                  Postcode: <span className={styles.mono}>{drawResult.postalCode}</span>
+                </p>
+                <p className={styles.resultMeta}>
+                  Ticketnummer: <span className={styles.mono}>{drawResult.ticketNumber}</span>
+                </p>
+                <button className={styles.button} type="button" onClick={handleReset}>
+                  Voer nog een postcode in
+                </button>
+              </section>
+            )}
+          </>
         )}
       </main>
     </>

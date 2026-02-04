@@ -108,15 +108,16 @@
 
 .resultImage {
   width: min(340px, 100%);
-  aspect-ratio: 400 / 300;
-  object-fit: contain;
+  /* aspect-ratio: 400 / 300; */
+  object-fit: cover;
   border-radius: 20px;
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .resultPrize {
   margin: 16px 0 10px;
-  font-size: 1.1rem;
+  font-size: 1.5rem;
+  
 }
 
 .resultMeta {
