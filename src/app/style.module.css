@@ -41,12 +41,14 @@
   font-size: clamp(2rem, 7vw, 4.5rem);
   line-height: 0.95;
   letter-spacing: -0.03em;
+  pointer-events: none;
 }
 
 .subtitle {
   margin: 18px 0 0;
   font-size: clamp(1rem, 2.5vw, 1.25rem);
   color: rgba(255, 255, 255, 0.85);
+  pointer-events: none;
 }
 
 .form {
