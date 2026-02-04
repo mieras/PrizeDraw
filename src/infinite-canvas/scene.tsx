@@ -315,7 +315,7 @@ function SceneController({
       s.drift.y = lerp(s.drift.y, s.mouse.y * parallaxStrength, 0.12);
     } else if (interactionMode === "animating") {
       const eased = easeInOutCubic(clamp(animationProgress, 0, 1));
-      const travelZ = INITIAL_CAMERA_Z - 210;
+      const travelZ = INITIAL_CAMERA_Z - 420;
       const travelX = Math.sin(eased * Math.PI * 2 + focusSeed * Math.PI * 2) * 5.5;
       const travelY = Math.cos(eased * Math.PI * 2 + focusSeed * Math.PI) * 4.5;
 
@@ -327,7 +327,7 @@ function SceneController({
     } else {
       s.basePos.x = lerp(s.basePos.x, 0, 0.06);
       s.basePos.y = lerp(s.basePos.y, 0, 0.06);
-      s.basePos.z = lerp(s.basePos.z, INITIAL_CAMERA_Z - 210, 0.06);
+      s.basePos.z = lerp(s.basePos.z, INITIAL_CAMERA_Z - 420, 0.06);
       s.drift.x = lerp(s.drift.x, 0, 0.1);
       s.drift.y = lerp(s.drift.y, 0, 0.1);
     }

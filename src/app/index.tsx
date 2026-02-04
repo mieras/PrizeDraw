@@ -26,7 +26,7 @@ export function App() {
 
   const isPostalCodeValid = POSTAL_CODE_PATTERN.test(postalCodeInput);
   const sceneFadeOpacity =
-    phase === "animating" ? Math.max(0, Math.min(1, (animationProgress - 0.68) / 0.32)) * 0.92 : phase === "revealed" ? 0.92 : 0;
+    phase === "animating" ? Math.max(0, Math.min(1, (animationProgress - 0.64) / 0.36)) : phase === "revealed" ? 1 : 0;
 
   React.useEffect(() => {
     if (phase !== "animating") {
@@ -130,7 +130,7 @@ export function App() {
         )}
 
         {phase === "revealed" && drawResult && (
-          <section className={styles.resultPanel} aria-live="polite">
+          <section className={`${styles.resultPanel} ${styles.resultPlain}`} aria-live="polite">
             <h2>Jouw prijs</h2>
             <img className={styles.resultImage} src={drawResult.prize.url} alt={drawResult.prizeLabel} />
             <p className={styles.resultPrize}>{drawResult.prizeLabel}</p>

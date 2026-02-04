@@ -14,9 +14,8 @@
   inset: 0;
   z-index: 6;
   pointer-events: none;
-  background: rgba(245, 245, 245, 0.95);
-  backdrop-filter: blur(4px);
-  transition: opacity 140ms linear;
+  background: #fff;
+  transition: opacity 180ms linear;
 }
 
 .panel,
@@ -30,6 +29,7 @@
   backdrop-filter: blur(18px);
   color: #fff;
   padding: clamp(24px, 4vw, 42px);
+  text-align: center;
 }
 
 .title {
@@ -134,6 +134,27 @@
 .resultPanel .button {
   margin-top: 24px;
   width: min(340px, 100%);
+}
+
+.resultPlain {
+  background: transparent;
+  border: 0;
+  backdrop-filter: none;
+  color: #111;
+  text-align: center;
+}
+
+.resultPlain .resultImage {
+  border: 1px solid rgba(17, 17, 17, 0.12);
+}
+
+.resultPlain .resultMeta {
+  color: #2a2a2a;
+}
+
+.resultPlain .button {
+  background: #111;
+  color: #fff;
 }
 
 @keyframes fadeIn {
