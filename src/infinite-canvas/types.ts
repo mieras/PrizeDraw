@@ -6,6 +6,14 @@ export type MediaItem = {
   height: number;
 };
 
+export type PrizeManifestItem = MediaItem & {
+  title: string;
+  lidwoord: string;
+  omschrijvingKort: string;
+  omschrijvingFull: string;
+  uitslagTitle: string;
+};
+
 export type InfiniteCanvasProps = {
   media: MediaItem[];
   onTextureProgress?: (progress: number) => void;

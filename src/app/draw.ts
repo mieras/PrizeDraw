@@ -1,8 +1,8 @@
-import type { MediaItem } from "~/src/infinite-canvas/types";
+import type { MediaItem, PrizeManifestItem } from "~/src/infinite-canvas/types";
 
 export type DrawResult = {
   postalCode: string;
-  prize: MediaItem;
+  prize: MediaItem | PrizeManifestItem;
   prizeIndex: number;
   prizeLabel: string;
   ticketNumber: string;
@@ -19,12 +19,19 @@ function hashString(input: string) {
   return hash >>> 0;
 }
 
-function getPrizeLabel(url: string) {
-  const fileName = decodeURIComponent(url.split("/").pop() ?? "Prijs");
+function getPrizeLabel(prize: MediaItem | PrizeManifestItem): string {
+  if ("title" in prize && typeof prize.title === "string" && prize.title) {
+    const lid = "lidwoord" in prize && typeof prize.lidwoord === "string" ? prize.lidwoord : "";
+    return [lid, prize.title].filter(Boolean).join(" ").trim();
+  }
+  const fileName = decodeURIComponent(prize.url.split("/").pop() ?? "Prijs");
   return fileName.replace(/\.[^.]+$/, "");
 }
 
-export function drawPrize(postalCode: string, media: MediaItem[]): DrawResult {
+export function drawPrize(
+  postalCode: string,
+  media: (MediaItem | PrizeManifestItem)[],
+): DrawResult {
   const normalizedPostalCode = postalCode.trim().toUpperCase();
   const hash = hashString(normalizedPostalCode);
 
@@ -42,7 +49,7 @@ export function drawPrize(postalCode: string, media: MediaItem[]): DrawResult {
     postalCode: normalizedPostalCode,
     prize,
     prizeIndex,
-    prizeLabel: getPrizeLabel(prize.url),
+    prizeLabel: getPrizeLabel(prize),
     ticketNumber,
   };
 }

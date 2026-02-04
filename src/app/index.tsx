@@ -1,10 +1,27 @@
 import * as React from "react";
-import manifest from "~/src/artworks/manifest.json";
+import artworksManifest from "~/src/artworks/manifest.json";
+import prizeManifest from "~/src/prizes/manifest.json";
 import { InfiniteCanvas } from "~/src/infinite-canvas";
-import type { MediaItem } from "~/src/infinite-canvas/types";
+import type { MediaItem, PrizeManifestItem } from "~/src/infinite-canvas/types";
 import { PageLoader } from "~/src/loader";
 import { drawPrize, type DrawResult } from "./draw";
 import styles from "./style.module.css";
+
+/** Switch: true = prizes (CSV), false = artworks */
+const USE_PRIZES = true;
+
+const base = (import.meta.env.BASE_URL ?? "/").replace(/\/*$/, "/");
+function assetUrl(url: string): string {
+  const path = url.startsWith("/") ? url.slice(1) : url;
+  return `${base}${path}`;
+}
+
+function withBaseUrl<T extends { url: string }>(items: T[]): T[] {
+  return items.map((item) => ({ ...item, url: assetUrl(item.url) }));
+}
+
+const rawMedia = USE_PRIZES ? (prizeManifest as PrizeManifestItem[]) : (artworksManifest as MediaItem[]);
+const media = withBaseUrl(rawMedia);
 
 type Phase = "idle" | "animating" | "revealed";
 
@@ -16,7 +33,7 @@ function sanitizePostalCode(input: string) {
 }
 
 export function App() {
-  const [media] = React.useState<MediaItem[]>(manifest);
+  const [mediaItems] = React.useState(media);
   const [textureProgress, setTextureProgress] = React.useState(0);
 
   const [phase, setPhase] = React.useState<Phase>("idle");
@@ -59,11 +76,11 @@ export function App() {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    if (!isPostalCodeValid || !media.length) {
+    if (!isPostalCodeValid || !mediaItems.length) {
       return;
     }
 
-    const result = drawPrize(postalCodeInput, media);
+    const result = drawPrize(postalCodeInput, mediaItems);
     setDrawResult(result);
     setAnimationProgress(0);
     setPhase("animating");
@@ -74,7 +91,7 @@ export function App() {
     setAnimationProgress(0);
   };
 
-  if (!media.length) {
+  if (!mediaItems.length) {
     return <PageLoader progress={0} />;
   }
 
@@ -82,7 +99,7 @@ export function App() {
     <>
       <PageLoader progress={textureProgress} />
       <InfiniteCanvas
-        media={media}
+        media={mediaItems}
         onTextureProgress={setTextureProgress}
         interactionMode={phase}
         animationProgress={animationProgress}
@@ -134,6 +151,12 @@ export function App() {
             <h2>Jouw prijs</h2>
             <img className={styles.resultImage} src={drawResult.prize.url} alt={drawResult.prizeLabel} />
             <p className={styles.resultPrize}>{drawResult.prizeLabel}</p>
+            {"omschrijvingKort" in drawResult.prize && drawResult.prize.omschrijvingKort ? (
+              <p className={styles.resultMeta}>{drawResult.prize.omschrijvingKort}</p>
+            ) : null}
+            {"uitslagTitle" in drawResult.prize && drawResult.prize.uitslagTitle && drawResult.prize.uitslagTitle !== "-" ? (
+              <p className={styles.resultMeta}>{drawResult.prize.uitslagTitle}</p>
+            ) : null}
             <p className={styles.resultMeta}>
               Postcode: <span className={styles.mono}>{drawResult.postalCode}</span>
             </p>
