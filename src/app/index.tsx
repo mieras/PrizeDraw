@@ -93,6 +93,8 @@ export function App() {
   const handleReset = () => {
     setPhase("idle");
     setAnimationProgress(0);
+    setPostalCodeInput("");
+    setDrawResult(null);
   };
 
   if (!mediaItems.length) {
