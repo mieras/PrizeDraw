@@ -5,7 +5,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: var(--color-loader-bg);
+  background: radial-gradient(77.78% 140% at 50% 50%, #E30027 24.5%, #A3001C 100%);
   transition: opacity 0.5s ease-out;
 }
 
@@ -21,7 +21,7 @@
 
 .progressBarContainer {
   width: 200px;
-  background-color: var(--color-loader-bar-bg);
+  background-color: rgb(0 0 0 / 0.1);
   height: 4px;
   border-radius: 2px;
   overflow: hidden;
@@ -31,5 +31,5 @@
   height: 100%;
   width: 100%;
   transform-origin: left;
-  background-color: var(--color-loader-bar-fill);
+  background-color: var(--postcode-lottery-colors-white);
 }

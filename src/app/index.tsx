@@ -27,7 +27,7 @@ const media = withBaseUrl(rawMedia);
 type Phase = "idle" | "animating" | "revealed";
 
 const POSTAL_CODE_PATTERN = /^\d{4}[A-Z]{2}$/;
-const REVEAL_DURATION_MS = 5000;
+const REVEAL_DURATION_MS = 4000;
 
 function sanitizePostalCode(input: string) {
   const cleaned = input.toUpperCase().replace(/\s+/g, "").replace(/[^A-Z0-9]/g, "");
@@ -47,7 +47,7 @@ export function App() {
 
   const isPostalCodeValid = POSTAL_CODE_PATTERN.test(postalCodeInput);
   const sceneFadeOpacity =
-    phase === "animating" ? Math.max(0, Math.min(1, (animationProgress - 0.64) / 0.36)) : phase === "revealed" ? 1 : 0;
+    phase === "animating" ? Math.max(0, Math.min(1, (animationProgress - 0.5) / 0.25)) : phase === "revealed" ? 1 : 0;
 
   React.useEffect(() => {
     if (phase !== "animating") {
@@ -108,8 +108,8 @@ export function App() {
         interactionMode={phase}
         animationProgress={animationProgress}
         focusMediaIndex={drawResult?.prizeIndex ?? null}
-        backgroundColor="#070707"
-        fogColor="#070707"
+        backgroundColor="transparent"
+        fogColor="#E30027"
         fogNear={120}
         fogFar={320}
       />
@@ -119,11 +119,11 @@ export function App() {
         {phase === "idle" && (
           <section className={styles.panel}>
             <h1 className={styles.title}>Behoor jij tot de winnaars?</h1>
-            <p className={styles.subtitle}>Vul je postcode in</p>
+            <p className={styles.subtitle}>Elke 1e van de maand maken we de uitslagen bekend.</p>
 
             <form className={styles.form} onSubmit={handleSubmit}>
               <label className={styles.inputLabel} htmlFor="postalCodeInput">
-                Postcode
+                Vul je postcode in
               </label>
               <input
                 id="postalCodeInput"
@@ -132,12 +132,13 @@ export function App() {
                 onChange={(event) => setPostalCodeInput(sanitizePostalCode(event.target.value))}
                 placeholder="1234AB"
                 autoComplete="postal-code"
+                autoFocus
                 inputMode="text"
                 spellCheck={false}
                 aria-invalid={!isPostalCodeValid && postalCodeInput.length > 0}
                 maxLength={8}
               />
-              <button className={styles.button} type="submit" disabled={!isPostalCodeValid}>
+              <button className={`${styles.button} ${styles.buttonInverted}`} type="submit" disabled={!isPostalCodeValid}>
                 Bekijk uitslag
               </button>
             </form>
@@ -156,6 +157,14 @@ export function App() {
             {drawResult && (
               <section className={`${styles.resultPanel} ${styles.resultPlain}`} aria-live="polite">
                 <h2>Jouw prijs</h2>
+                <div className={styles.resultMetaRow}>
+                  <p className={styles.resultMeta}>
+                    Postcode: <span className={styles.mono}>{drawResult.postalCode}</span>
+                  </p>
+                  <p className={styles.resultMeta}>
+                    Ticketnummer: <span className={styles.mono}>{drawResult.ticketNumber}</span>
+                  </p>
+                </div>
                 <img className={styles.resultImage} src={drawResult.prize.url} alt={drawResult.prizeLabel} />
                 <h3 className={styles.resultPrize}>
                   {drawResult.prizeLabel
@@ -163,17 +172,11 @@ export function App() {
                     : ""}
                 </h3>
                 {"uitslagTitle" in drawResult.prize && drawResult.prize.uitslagTitle && drawResult.prize.uitslagTitle !== "-" ? (
-                  <p className={styles.resultMeta}>{drawResult.prize.uitslagTitle}</p>
+                  <p className={styles.resultInfo}>{drawResult.prize.uitslagTitle}</p>
                 ) : null}
                 {"omschrijvingKort" in drawResult.prize && drawResult.prize.omschrijvingKort ? (
-                  <p className={styles.resultMeta}>{drawResult.prize.omschrijvingKort}</p>
+                  <p className={styles.resultInfo}>{drawResult.prize.omschrijvingKort}</p>
                 ) : null}
-                <p className={styles.resultMeta}>
-                  Postcode: <span className={styles.mono}>{drawResult.postalCode}</span>
-                </p>
-                <p className={styles.resultMeta}>
-                  Ticketnummer: <span className={styles.mono}>{drawResult.ticketNumber}</span>
-                </p>
                 <button className={styles.button} type="button" onClick={handleReset}>
                   Voer nog een postcode in
                 </button>

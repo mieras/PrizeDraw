@@ -16,6 +16,10 @@
   touch-action: none;
 }
 
+.canvasTransparent {
+  background-color: transparent;
+}
+
 .infoPanel {
   position: absolute;
   top: 12px;
