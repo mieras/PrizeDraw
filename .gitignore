@@ -1,0 +1,10 @@
+# Dependencies
+node_modules/
+
+# Build
+dist/
+*.local
+
+# Input assets (downloaded from prizes.md)
+input/
+scripts/download-prizes.mjs

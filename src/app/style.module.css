@@ -89,8 +89,10 @@
 }
 
 .button:disabled {
-  opacity: 0.45;
+  opacity: 1;
+  background: #ffffff4a;
   cursor: not-allowed;
+  backdrop-filter: blur(32px);
 }
 
 .loadingPanel,
