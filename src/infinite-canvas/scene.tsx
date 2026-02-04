@@ -427,16 +427,18 @@ export function InfiniteCanvasScene({
     return null;
   }
 
+  const isTransparent = backgroundColor === "transparent";
+
   return (
     <div className={styles.container}>
       <Canvas
         camera={{ position: [0, 0, INITIAL_CAMERA_Z], fov: cameraFov, near: cameraNear, far: cameraFar }}
         dpr={dpr}
         flat
-        gl={{ antialias: false, powerPreference: "high-performance" }}
-        className={styles.canvas}
+        gl={{ antialias: false, powerPreference: "high-performance", alpha: isTransparent }}
+        className={isTransparent ? `${styles.canvas} ${styles.canvasTransparent}` : styles.canvas}
       >
-        <color attach="background" args={[backgroundColor]} />
+        {!isTransparent && <color attach="background" args={[backgroundColor]} />}
         <fog attach="fog" args={[fogColor, fogNear, fogFar]} />
         <SceneController
           media={media}

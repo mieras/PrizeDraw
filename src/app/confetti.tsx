@@ -87,10 +87,10 @@ export function Confetti({ colorMode = "gold" }: { colorMode?: ColorMode }) {
     resize();
     window.addEventListener("resize", resize);
 
-    const baseSize = 10;
-    const baseLength = 6;
-    const speedMult = 1.5;
-    const amount = 100;
+    const baseSize = 12;
+    const baseLength = 8;
+    const speedMult = 3;
+    const amount = 120;
 
     const { wCss, hCss } = dimensionsRef.current;
     ribbonsRef.current = createFallingRibbons(

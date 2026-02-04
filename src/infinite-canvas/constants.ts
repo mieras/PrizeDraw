@@ -10,7 +10,7 @@ export const INVIS_THRESHOLD = 0.01;
 export const KEYBOARD_SPEED = 0.18;
 export const VELOCITY_LERP = 0.16;
 export const VELOCITY_DECAY = 0.9;
-export const INITIAL_CAMERA_Z = 50;
+export const INITIAL_CAMERA_Z = 47;
 
 export type ChunkOffset = {
   dx: number;

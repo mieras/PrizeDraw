@@ -4,14 +4,14 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  --color-background: #000;
+  --color-background: var(--generic-fill-colors-fill-brand);
   --color-text: #fff;
   --color-link: #fff;
   --color-link-hover: #fff;
   --page-padding: 1.5rem;
-  --color-loader-bg: #ffffff;
-  --color-loader-bar-bg: rgba(101, 82, 60, 0.1);
-  --color-loader-bar-fill: rgb(101, 82, 60);
+  --color-loader-bg: var(--generic-fill-colors-fill-brand);
+  --color-loader-bar-bg: var(--postcode-lottery-colors-black-20-percent);
+  --color-loader-bar-fill: var(--postcode-lottery-colors-white);
 }
 
 *,
@@ -24,7 +24,7 @@ body {
   margin: 0;
   padding: 0;
   color: var(--color-text);
-  background-color: var(--color-background);
+  background: radial-gradient(77.78% 140% at 50% 50%, #E30027 24.5%, #A3001C 100%);
   overflow: hidden;
 }
 
