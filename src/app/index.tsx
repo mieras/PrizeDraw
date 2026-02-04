@@ -125,7 +125,7 @@ export function App() {
 
         {phase === "animating" && (
           <section className={styles.loadingPanel} aria-live="polite">
-            <p>Uitslag wordt berekend...</p>
+            <p>Moment, wij zoeken {postalCodeInput.length === 6 ? `${postalCodeInput.slice(0, 4)} ${postalCodeInput.slice(4)}` : postalCodeInput} tussen de winnaars</p>
           </section>
         )}
 
