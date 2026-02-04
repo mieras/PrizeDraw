@@ -112,7 +112,7 @@ export function App() {
         focusMediaIndex={drawResult?.prizeIndex ?? null}
         backgroundColor="transparent"
         fogColor="#E30027"
-        fogNear={120}
+        fogNear={20}
         fogFar={320}
       />
       <div className={styles.sceneFade} style={{ opacity: sceneFadeOpacity }} />

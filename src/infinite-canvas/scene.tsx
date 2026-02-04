@@ -10,6 +10,7 @@ import {
   CHUNK_SIZE,
   DEPTH_FADE_END,
   DEPTH_FADE_START,
+  DRAG_SENSITIVITY,
   INITIAL_CAMERA_Z,
   INVIS_THRESHOLD,
   RENDER_DISTANCE,
@@ -229,6 +230,8 @@ type ControllerState = {
   lastChunkKey: string;
   lastChunkUpdate: number;
   pendingChunk: { cx: number; cy: number; cz: number } | null;
+  isDragging: boolean;
+  lastDragClient: { x: number; y: number };
 };
 
 const createInitialState = (camZ: number): ControllerState => ({
@@ -238,6 +241,8 @@ const createInitialState = (camZ: number): ControllerState => ({
   lastChunkKey: "",
   lastChunkUpdate: 0,
   pendingChunk: null,
+  isDragging: false,
+  lastDragClient: { x: 0, y: 0 },
 });
 
 const easeInOutCubic = (value: number) =>
@@ -280,10 +285,17 @@ function SceneController({
   React.useEffect(() => {
     const canvas = gl.domElement;
     const s = state.current;
-    canvas.style.cursor = "default";
+
+    const setCursor = (cursor: string) => {
+      canvas.style.cursor = cursor;
+    };
 
     const onMouseLeave = () => {
       s.mouse = { x: 0, y: 0 };
+      if (s.isDragging) {
+        s.isDragging = false;
+        setCursor("grab");
+      }
     };
 
     const onMouseMove = (e: MouseEvent) => {
@@ -293,14 +305,61 @@ function SceneController({
       };
     };
 
+    const onPointerDown = (e: PointerEvent) => {
+      if (e.button !== 0 || interactionMode !== "idle") return;
+      s.isDragging = true;
+      s.lastDragClient = { x: e.clientX, y: e.clientY };
+      setCursor("grabbing");
+      canvas.setPointerCapture(e.pointerId);
+    };
+
+    const onPointerMove = (e: PointerEvent) => {
+      if (s.isDragging && e.buttons === 0) {
+        s.isDragging = false;
+        setCursor("grab");
+        canvas.releasePointerCapture(e.pointerId);
+        return;
+      }
+      if (s.isDragging) {
+        e.preventDefault();
+        const dx = e.clientX - s.lastDragClient.x;
+        const dy = e.clientY - s.lastDragClient.y;
+        s.basePos.x += dx * DRAG_SENSITIVITY;
+        s.basePos.y -= dy * DRAG_SENSITIVITY;
+        s.lastDragClient = { x: e.clientX, y: e.clientY };
+      }
+    };
+
+    const onPointerUp = (e: PointerEvent) => {
+      if (e.button !== 0) return;
+      if (s.isDragging) {
+        s.isDragging = false;
+        setCursor("grab");
+        canvas.releasePointerCapture(e.pointerId);
+      }
+    };
+
+    if (interactionMode !== "idle") {
+      s.isDragging = false;
+    }
+    setCursor(interactionMode === "idle" ? "grab" : "default");
     window.addEventListener("mousemove", onMouseMove);
     canvas.addEventListener("mouseleave", onMouseLeave);
+    const pointerOpts = { passive: false };
+    canvas.addEventListener("pointerdown", onPointerDown);
+    canvas.addEventListener("pointermove", onPointerMove, pointerOpts);
+    canvas.addEventListener("pointerup", onPointerUp);
+    canvas.addEventListener("pointercancel", onPointerUp);
 
     return () => {
       window.removeEventListener("mousemove", onMouseMove);
       canvas.removeEventListener("mouseleave", onMouseLeave);
+      canvas.removeEventListener("pointerdown", onPointerDown);
+      canvas.removeEventListener("pointermove", onPointerMove);
+      canvas.removeEventListener("pointerup", onPointerUp);
+      canvas.removeEventListener("pointercancel", onPointerUp);
     };
-  }, [gl]);
+  }, [gl, interactionMode]);
 
   React.useEffect(() => {
     if (interactionMode !== "animating") {
@@ -315,8 +374,6 @@ function SceneController({
     const parallaxStrength = isTouchDevice ? 0 : 2.6;
 
     if (interactionMode === "idle") {
-      s.basePos.x = lerp(s.basePos.x, 0, 0.08);
-      s.basePos.y = lerp(s.basePos.y, 0, 0.08);
       s.basePos.z = lerp(s.basePos.z, INITIAL_CAMERA_Z, 0.08);
       s.drift.x = lerp(s.drift.x, s.mouse.x * parallaxStrength, 0.12);
       s.drift.y = lerp(s.drift.y, s.mouse.y * parallaxStrength, 0.12);
