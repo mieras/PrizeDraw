@@ -131,7 +131,7 @@ export function Confetti({ colorMode = "gold" }: { colorMode?: ColorMode }) {
     };
 
     const animate = () => {
-      const { w, h, wCss, hCss } = dimensionsRef.current;
+      const { w, h, hCss } = dimensionsRef.current;
       const dpr = window.devicePixelRatio ?? 1;
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, w, h);
