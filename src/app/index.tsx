@@ -163,10 +163,10 @@ export function App() {
                     : ""}
                 </h3>
                 {"uitslagTitle" in drawResult.prize && drawResult.prize.uitslagTitle && drawResult.prize.uitslagTitle !== "-" ? (
-                  <p className={styles.resultMeta}>{drawResult.prize.uitslagTitle}</p>
+                  <p className={styles.resultInfo}>{drawResult.prize.uitslagTitle}</p>
                 ) : null}
                 {"omschrijvingKort" in drawResult.prize && drawResult.prize.omschrijvingKort ? (
-                  <p className={styles.resultMeta}>{drawResult.prize.omschrijvingKort}</p>
+                  <p className={styles.resultInfo}>{drawResult.prize.omschrijvingKort}</p>
                 ) : null}
                 <p className={styles.resultMeta}>
                   Postcode: <span className={styles.mono}>{drawResult.postalCode}</span>

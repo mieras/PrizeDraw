@@ -90,27 +90,56 @@
   /* width: fit-content; */
 }
 
+/* Primary button: DS kleur, shadow en states (eigen CSS, design tokens) */
 .button {
+  --btn-shadow-offset: calc(var(--button-effects-button-shadow-primary-y-offset) * -1);
   margin-top: 8px;
-  padding: 1rem 3rem;
-  min-height: 64px;
-  
   width: 100%;
-  border-radius: 999px;
+  max-width: 22.5rem;
+  height: var(--ds-core--button--height--container);
+  padding: 0 2.5rem;
   border: 0;
-  background: #fff;
-  color: #131313;
-  font-size: clamp(1.25rem, 3vw, 1.5rem);
-  font-weight: 600;
+  border-radius: 0.5rem;
+  background: var(--button-fill-button-fill-primary);
+  color: var(--button-text-color-button-text-fill-primary);
+  font-size: var(--typography-font-sizes-body-font-size);
+  font-weight: var(--ds-core--typography--font-weight--strong);
+  line-height: var(--typography-line-height-body-compact-line-height);
   cursor: pointer;
-  
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 var(--btn-shadow-offset) 0 0 var(--button-effects-button-primary-shadow-color);
+  transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.1s ease;
 }
 
+.button:hover {
+  background: var(--button-fill-button-fill-primary-hover);
+  box-shadow: 0 var(--btn-shadow-offset) 0 0 var(--button-effects-button-primary-shadow-color-hover);
+}
+
+.button:active {
+  transform: translateY(var(--btn-shadow-offset));
+  box-shadow: 0 0 0 0 var(--button-effects-button-primary-shadow-color-hover);
+}
+
+.button:focus {
+  outline: none;
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--actions-stroke-colors-action-stroke-color-focus);
+  outline-offset: 0.125rem;
+}
+
+/* Disabled: plat blok, geen shadow, volle hoogte (zoals DS) */
 .button:disabled {
-  opacity: 1;
-  background: #ffffff4a;
+  background: var(--button-fill-button-fill-disabled);
+  color: var(--button-text-color-button-text-fill-disabled);
+  box-shadow: none;
   cursor: not-allowed;
-  backdrop-filter: blur(32px);
+  transform: none;
 }
 
 .loadingPanel,
@@ -138,13 +167,23 @@
   
 }
 
+.resultInfo {
+  margin: 0;
+  color: #000;
+  line-height: 150%;
+  font-size: var(--typography-font-sizes-body-font-size);
+  margin-top: 1rem;
+}
+
 .resultMeta {
   margin: 0;
-  color: rgba(255, 255, 255, 0.85);
+  color: #000;
+  line-height: 150%;
+  font-size: 
 }
 
 .resultMeta + .resultMeta {
-  margin-top: 4px;
+  margin-top: 1rem;
 }
 
 .mono {
@@ -171,11 +210,6 @@
 
 .resultPlain .resultMeta {
   color: #2a2a2a;
-}
-
-.resultPlain .button {
-  background: #111;
-  color: #fff;
 }
 
 @keyframes fadeIn {
