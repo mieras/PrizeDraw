@@ -266,7 +266,9 @@ function SceneController({
 
   const state = React.useRef<ControllerState>(createInitialState(INITIAL_CAMERA_Z));
   const cameraGridRef = React.useRef<CameraGridState>({ cx: 0, cy: 0, cz: 0, camZ: camera.position.z });
-  const animationStartRef = React.useRef<{ x: number; y: number; z: number } | null>(null);
+  const animationStartRef = React.useRef<{ x: number; y: number; z: number; targetX: number; targetY: number } | null>(
+    null
+  );
 
   const [chunks, setChunks] = React.useState<ChunkData[]>([]);
 
@@ -379,17 +381,23 @@ function SceneController({
       s.drift.y = lerp(s.drift.y, s.mouse.y * parallaxStrength, 0.12);
     } else if (interactionMode === "animating") {
       if (animationStartRef.current === null) {
+        const startCx = Math.floor(s.basePos.x / CHUNK_SIZE);
+        const startCy = Math.floor(s.basePos.y / CHUNK_SIZE);
+        const targetX = (startCx + 0.5) * CHUNK_SIZE;
+        const targetY = (startCy + 0.5) * CHUNK_SIZE;
         animationStartRef.current = {
           x: s.basePos.x + s.drift.x,
           y: s.basePos.y + s.drift.y,
           z: s.basePos.z,
+          targetX,
+          targetY,
         };
       }
 
       const eased = easeInOutCubic(clamp(animationProgress, 0, 1));
       const travelZ = INITIAL_CAMERA_Z - 420;
-      const travelX = Math.sin(eased * Math.PI * 2 + focusSeed * Math.PI * 2) * 5.5;
-      const travelY = Math.cos(eased * Math.PI * 2 + focusSeed * Math.PI) * 4.5;
+      const travelX = animationStartRef.current.targetX;
+      const travelY = animationStartRef.current.targetY;
 
       const start = animationStartRef.current;
       s.basePos.x = lerp(start.x, travelX, eased);
