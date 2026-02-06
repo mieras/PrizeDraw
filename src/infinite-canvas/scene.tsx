@@ -380,7 +380,6 @@ function SceneController({
   useFrame(() => {
     const s = state.current;
     const now = performance.now();
-    const focusSeed = ((focusMediaIndex ?? 0) % 17) / 17;
     const parallaxStrength = isTouchDevice ? 0 : 2.6;
 
     if (reducedMotion) {
