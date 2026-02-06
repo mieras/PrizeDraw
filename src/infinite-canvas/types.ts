@@ -20,6 +20,7 @@ export type InfiniteCanvasProps = {
   interactionMode?: "idle" | "animating" | "revealed";
   animationProgress?: number;
   focusMediaIndex?: number | null;
+  reducedMotion?: boolean;
   showFps?: boolean;
   showControls?: boolean;
   cameraFov?: number;
