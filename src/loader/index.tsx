@@ -1,7 +1,11 @@
 import * as React from "react";
 import styles from "./style.module.css";
 
-export function PageLoader({ progress }: { progress: number }) {
+export function PageLoader({ progress, reducedMotion = false }: { progress: number; reducedMotion?: boolean }) {
+  if (reducedMotion) {
+    return null;
+  }
+
   const [show, setShow] = React.useState(true);
   const [minTimeElapsed, setMinTimeElapsed] = React.useState(false);
   const visualRef = React.useRef(0);

@@ -4,6 +4,7 @@ import prizeManifest from "~/src/prizes/manifest.json";
 import { InfiniteCanvas } from "~/src/infinite-canvas";
 import type { MediaItem, PrizeManifestItem } from "~/src/infinite-canvas/types";
 import { PageLoader } from "~/src/loader";
+import { useReducedMotion } from "~/src/use-reduced-motion";
 import { Confetti } from "./confetti";
 import { drawPrize, type DrawResult } from "./draw";
 import styles from "./style.module.css";
@@ -39,6 +40,7 @@ function sanitizePostalCode(input: string) {
 export function App() {
   const [mediaItems] = React.useState(media);
   const [textureProgress, setTextureProgress] = React.useState(0);
+  const reducedMotion = useReducedMotion();
 
   const [phase, setPhase] = React.useState<Phase>("idle");
   const [postalCodeInput, setPostalCodeInput] = React.useState("");
@@ -46,11 +48,18 @@ export function App() {
   const [animationProgress, setAnimationProgress] = React.useState(0);
 
   const isPostalCodeValid = POSTAL_CODE_PATTERN.test(postalCodeInput);
-  const sceneFadeOpacity =
-    phase === "animating" ? Math.max(0, Math.min(1, (animationProgress - 0.5) / 0.25)) : phase === "revealed" ? 1 : 0;
+  const sceneFadeOpacity = reducedMotion
+    ? phase === "revealed"
+      ? 1
+      : 0
+    : phase === "animating"
+      ? Math.max(0, Math.min(1, (animationProgress - 0.5) / 0.25))
+      : phase === "revealed"
+        ? 1
+        : 0;
 
   React.useEffect(() => {
-    if (phase !== "animating") {
+    if (phase !== "animating" || reducedMotion) {
       return;
     }
 
@@ -75,7 +84,7 @@ export function App() {
     return () => {
       cancelAnimationFrame(rafId);
     };
-  }, [phase]);
+  }, [phase, reducedMotion]);
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -86,8 +95,13 @@ export function App() {
 
     const result = drawPrize(postalCodeInput, mediaItems);
     setDrawResult(result);
-    setAnimationProgress(0);
-    setPhase("animating");
+    if (reducedMotion) {
+      setAnimationProgress(1);
+      setPhase("revealed");
+    } else {
+      setAnimationProgress(0);
+      setPhase("animating");
+    }
   };
 
   const handleReset = () => {
@@ -103,13 +117,14 @@ export function App() {
 
   return (
     <>
-      <PageLoader progress={textureProgress} />
+      <PageLoader progress={textureProgress} reducedMotion={reducedMotion} />
       <InfiniteCanvas
         media={mediaItems}
         onTextureProgress={setTextureProgress}
         interactionMode={phase}
         animationProgress={animationProgress}
         focusMediaIndex={drawResult?.prizeIndex ?? null}
+        reducedMotion={reducedMotion}
         backgroundColor="transparent"
         fogColor="#E30027"
         fogNear={20}
@@ -155,7 +170,7 @@ export function App() {
 
         {phase === "revealed" && (
           <>
-            <Confetti colorMode="gold" />
+            {!reducedMotion && <Confetti colorMode="gold" />}
             {drawResult && (
               <section className={`${styles.resultPanel} ${styles.resultPlain}`} aria-live="polite">
                 <h2>Jouw prijs</h2>

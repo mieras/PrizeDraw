@@ -254,12 +254,14 @@ function SceneController({
   interactionMode,
   animationProgress,
   focusMediaIndex,
+  reducedMotion = false,
 }: {
   media: MediaItem[];
   onTextureProgress?: (progress: number) => void;
   interactionMode: "idle" | "animating" | "revealed";
   animationProgress: number;
   focusMediaIndex: number | null;
+  reducedMotion?: boolean;
 }) {
   const { camera, gl } = useThree();
   const isTouchDevice = useIsTouchDevice();
@@ -287,6 +289,12 @@ function SceneController({
   React.useEffect(() => {
     const canvas = gl.domElement;
     const s = state.current;
+
+    if (reducedMotion) {
+      canvas.style.cursor = "default";
+      s.isDragging = false;
+      return;
+    }
 
     const setCursor = (cursor: string) => {
       canvas.style.cursor = cursor;
@@ -361,7 +369,7 @@ function SceneController({
       canvas.removeEventListener("pointerup", onPointerUp);
       canvas.removeEventListener("pointercancel", onPointerUp);
     };
-  }, [gl, interactionMode]);
+  }, [gl, interactionMode, reducedMotion]);
 
   React.useEffect(() => {
     if (interactionMode !== "animating") {
@@ -375,7 +383,14 @@ function SceneController({
     const focusSeed = ((focusMediaIndex ?? 0) % 17) / 17;
     const parallaxStrength = isTouchDevice ? 0 : 2.6;
 
-    if (interactionMode === "idle") {
+    if (reducedMotion) {
+      const targetZ = interactionMode === "revealed" || interactionMode === "animating" ? INITIAL_CAMERA_Z - 420 : INITIAL_CAMERA_Z;
+      s.basePos.x = 0;
+      s.basePos.y = 0;
+      s.basePos.z = targetZ;
+      s.drift.x = 0;
+      s.drift.y = 0;
+    } else if (interactionMode === "idle") {
       s.basePos.z = lerp(s.basePos.z, INITIAL_CAMERA_Z, 0.08);
       s.drift.x = lerp(s.drift.x, s.mouse.x * parallaxStrength, 0.12);
       s.drift.y = lerp(s.drift.y, s.mouse.y * parallaxStrength, 0.12);
@@ -475,6 +490,7 @@ export function InfiniteCanvasScene({
   interactionMode = "idle",
   animationProgress = 0,
   focusMediaIndex = null,
+  reducedMotion = false,
   showFps = false,
   showControls = false,
   cameraFov = 60,
@@ -502,6 +518,7 @@ export function InfiniteCanvasScene({
         flat
         gl={{ antialias: false, powerPreference: "high-performance", alpha: isTransparent }}
         className={isTransparent ? `${styles.canvas} ${styles.canvasTransparent}` : styles.canvas}
+        style={reducedMotion ? { pointerEvents: "none" } : undefined}
       >
         {!isTransparent && <color attach="background" args={[backgroundColor]} />}
         <fog attach="fog" args={[fogColor, fogNear, fogFar]} />
@@ -511,6 +528,7 @@ export function InfiniteCanvasScene({
           interactionMode={interactionMode}
           animationProgress={animationProgress}
           focusMediaIndex={focusMediaIndex}
+          reducedMotion={reducedMotion}
         />
         {showFps && <Stats className={styles.stats} />}
       </Canvas>

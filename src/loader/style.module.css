@@ -33,3 +33,9 @@
   transform-origin: left;
   background-color: var(--postcode-lottery-colors-white);
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay {
+    transition: none;
+  }
+}
