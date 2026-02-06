@@ -253,14 +253,12 @@ function SceneController({
   onTextureProgress,
   interactionMode,
   animationProgress,
-  focusMediaIndex,
   reducedMotion = false,
 }: {
   media: MediaItem[];
   onTextureProgress?: (progress: number) => void;
   interactionMode: "idle" | "animating" | "revealed";
   animationProgress: number;
-  focusMediaIndex: number | null;
   reducedMotion?: boolean;
 }) {
   const { camera, gl } = useThree();
@@ -488,7 +486,6 @@ export function InfiniteCanvasScene({
   onTextureProgress,
   interactionMode = "idle",
   animationProgress = 0,
-  focusMediaIndex = null,
   reducedMotion = false,
   showFps = false,
   showControls = false,
@@ -526,7 +523,6 @@ export function InfiniteCanvasScene({
           onTextureProgress={onTextureProgress}
           interactionMode={interactionMode}
           animationProgress={animationProgress}
-          focusMediaIndex={focusMediaIndex}
           reducedMotion={reducedMotion}
         />
         {showFps && <Stats className={styles.stats} />}
