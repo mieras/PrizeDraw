@@ -19,7 +19,6 @@ export type InfiniteCanvasProps = {
   onTextureProgress?: (progress: number) => void;
   interactionMode?: "idle" | "animating" | "revealed";
   animationProgress?: number;
-  focusMediaIndex?: number | null;
   reducedMotion?: boolean;
   showFps?: boolean;
   showControls?: boolean;

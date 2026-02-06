@@ -123,7 +123,6 @@ export function App() {
         onTextureProgress={setTextureProgress}
         interactionMode={phase}
         animationProgress={animationProgress}
-        focusMediaIndex={drawResult?.prizeIndex ?? null}
         reducedMotion={reducedMotion}
         backgroundColor="transparent"
         fogColor="#E30027"
