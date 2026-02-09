@@ -32,7 +32,7 @@ const media = withBaseUrl(rawMedia);
 type Phase = "idle" | "animating" | "revealed";
 
 const POSTAL_CODE_PATTERN = /^\d{4}[A-Z]{2}$/;
-const REVEAL_DURATION_MS = 4000;
+const REVEAL_DURATION_MS = 3200;
 
 function sanitizePostalCode(input: string) {
   const cleaned = input.toUpperCase().replace(/\s+/g, "").replace(/[^A-Z0-9]/g, "");
@@ -57,7 +57,7 @@ export function App() {
       ? 1
       : 0
     : phase === "animating"
-      ? Math.max(0, Math.min(1, (animationProgress - 0.5) / 0.25))
+      ? Math.max(0, Math.min(1, (animationProgress - 0.6) / 0.2))
       : phase === "revealed"
         ? 1
         : 0;
