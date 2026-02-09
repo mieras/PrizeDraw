@@ -12,6 +12,7 @@ export type PrizeManifestItem = MediaItem & {
   omschrijvingKort: string;
   omschrijvingFull: string;
   uitslagTitle: string;
+  revealValue?: number;
 };
 
 export type InfiniteCanvasProps = {

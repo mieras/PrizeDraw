@@ -178,7 +178,7 @@
   animation: fadeIn 280ms ease-out;
 }
 
-loadingPanel p {
+.loadingPanel p {
   font-size: 1rem;
 }
 
@@ -235,6 +235,41 @@ loadingPanel p {
   width: min(340px, 100%);
 }
 
+.prizeReveal {
+  width: min(340px, 100%);
+  --reveal-image-blur: 12px;
+  --reveal-image-scale: 1.16;
+}
+
+.revealImage {
+  opacity: 0;
+  filter: blur(var(--reveal-image-blur));
+  transform: scale(var(--reveal-image-scale));
+  transition: opacity 500ms ease, filter 900ms ease, transform 1100ms cubic-bezier(0.2, 0.7, 0.15, 1);
+}
+
+.revealTitle {
+  opacity: 0;
+  filter: blur(4px);
+  white-space: normal;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+.revealDescription {
+  opacity: 0;
+  transform: translateY(10px);
+}
+
+:global(.revealWord) {
+  display: inline-block;
+  white-space: nowrap;
+}
+
+:global(.revealChar) {
+  display: inline-block;
+}
+
 .resultPlain {
   background: transparent;
   border: 0;
@@ -276,6 +311,12 @@ loadingPanel p {
   .loadingPanel,
   .resultPanel {
     animation: none;
+  }
+
+  .revealImage,
+  .revealTitle,
+  .revealDescription {
+    transition: none;
   }
 
   .button,

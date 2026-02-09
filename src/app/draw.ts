@@ -6,6 +6,7 @@ export type DrawResult = {
   prizeIndex: number;
   prizeLabel: string;
   ticketNumber: string;
+  revealValue: number;
 };
 
 function hashString(input: string): number {
@@ -21,9 +22,10 @@ function hashString(input: string): number {
 
 /** Seeded PRNG: zelfde postcode →zelfde seed →zelfde reeks. Gebruikt om per postcode een vaste maar "random" prijs te kiezen. */
 function seededRandom(seed: number): () => number {
+  let current = seed;
   return function next() {
-    seed = (seed * 1664525 + 1013904223) >>> 0;
-    return seed / 2 ** 32;
+    current = (current * 1664525 + 1013904223) >>> 0;
+    return current / 2 ** 32;
   };
 }
 
@@ -34,6 +36,13 @@ function getPrizeLabel(prize: MediaItem | PrizeManifestItem): string {
   }
   const fileName = decodeURIComponent(prize.url.split("/").pop() ?? "Prijs");
   return fileName.replace(/\.[^.]+$/, "");
+}
+
+function getRevealValue(prize: MediaItem | PrizeManifestItem): number {
+  if ("revealValue" in prize && typeof prize.revealValue === "number" && Number.isFinite(prize.revealValue)) {
+    return prize.revealValue;
+  }
+  return 1.5;
 }
 
 export function drawPrize(
@@ -61,5 +70,6 @@ export function drawPrize(
     prizeIndex,
     prizeLabel: getPrizeLabel(prize),
     ticketNumber,
+    revealValue: getRevealValue(prize),
   };
 }

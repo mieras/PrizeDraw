@@ -13,6 +13,43 @@ const COL_OMSCHRIJVING_KORT = 9;
 const COL_UITSLAG_TITLE = 10;
 const COL_IMAGE_URL = 12;
 
+const VALUE_RULES = [
+  { pattern: /superpostcodeprijs|1\s*miljoen|€\s*1\.?000\.?000/i, value: 10 },
+  { pattern: /10\s*jaar.*25\.?000|25\.?000.*per jaar/i, value: 9.4 },
+  { pattern: /\bbmw\b|naar keuze.*bmw/i, value: 8.6 },
+  { pattern: /playstation|ps5/i, value: 7.5 },
+  { pattern: /dyson/i, value: 7.1 },
+  { pattern: /€\s*500|shoptegoed.*500/i, value: 6.4 },
+  { pattern: /geldprijs.*1\.?000|€\s*1\.?000/i, value: 6.1 },
+  { pattern: /garmin|smartwatch/i, value: 5.7 },
+  { pattern: /fiets|roetz/i, value: 5.2 },
+  { pattern: /reiskofferset|reiskoffer/i, value: 4.5 },
+  { pattern: /giftcard|cadeaukaart|shoptegoed.*20|rituals/i, value: 0.5 },
+  { pattern: /boek|film|tijdschrift|plant/i, value: 1.8 },
+  { pattern: /sokken|keukentextiel|ovenschaal|paraplu|jbl|speaker|chocolade/i, value: 1.5 },
+  { pattern: /lokaal verscadeaukaart|bakkerscadeaukaart/i, value: 0.8 },
+  { pattern: /hema.*5|cadeaukaart.*5/i, value: 0.5 },
+];
+
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
+function inferRevealValue(entry) {
+  const text = [entry.title, entry.omschrijvingFull, entry.omschrijvingKort, entry.uitslagTitle]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+
+  for (const rule of VALUE_RULES) {
+    if (rule.pattern.test(text)) {
+      return clamp(rule.value, 0.5, 10);
+    }
+  }
+
+  return 1.5;
+}
+
 /**
  * Parse semicolon-separated CSV with quoted fields (handles newlines inside quotes).
  * Strips BOM from first field.
@@ -122,6 +159,7 @@ function main() {
       omschrijvingKort: entry.omschrijvingKort,
       omschrijvingFull: entry.omschrijvingFull,
       uitslagTitle: entry.uitslagTitle,
+      revealValue: inferRevealValue(entry),
     };
   });
 

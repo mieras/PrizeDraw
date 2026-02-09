@@ -4,9 +4,11 @@ import prizeManifest from "~/src/prizes/manifest.json";
 import { InfiniteCanvas } from "~/src/infinite-canvas";
 import type { MediaItem, PrizeManifestItem } from "~/src/infinite-canvas/types";
 import { PageLoader } from "~/src/loader";
+import { withRevealValues } from "~/src/prizes/reveal-values";
 import { useReducedMotion } from "~/src/use-reduced-motion";
 import { Confetti } from "./confetti";
 import { drawPrize, type DrawResult } from "./draw";
+import { PrizeReveal } from "./prize-reveal";
 import styles from "./style.module.css";
 
 /** Switch: true = prizes (CSV), false = artworks */
@@ -22,7 +24,9 @@ function withBaseUrl<T extends { url: string }>(items: T[]): T[] {
   return items.map((item) => ({ ...item, url: assetUrl(item.url) }));
 }
 
-const rawMedia = USE_PRIZES ? (prizeManifest as PrizeManifestItem[]) : (artworksManifest as MediaItem[]);
+const rawMedia = USE_PRIZES
+  ? withRevealValues(prizeManifest as PrizeManifestItem[])
+  : (artworksManifest as MediaItem[]);
 const media = withBaseUrl(rawMedia);
 
 type Phase = "idle" | "animating" | "revealed";
@@ -181,18 +185,7 @@ export function App() {
                     Ticketnummer: <span className={styles.mono}>{drawResult.ticketNumber}</span>
                   </p>
                 </div>
-                <img className={styles.resultImage} src={drawResult.prize.url} alt={drawResult.prizeLabel} />
-                <h3 className={styles.resultPrize}>
-                  {drawResult.prizeLabel
-                    ? drawResult.prizeLabel.charAt(0).toUpperCase() + drawResult.prizeLabel.slice(1)
-                    : ""}
-                </h3>
-                {"uitslagTitle" in drawResult.prize && drawResult.prize.uitslagTitle && drawResult.prize.uitslagTitle !== "-" ? (
-                  <p className={styles.resultInfo}>{drawResult.prize.uitslagTitle}</p>
-                ) : null}
-                {"omschrijvingKort" in drawResult.prize && drawResult.prize.omschrijvingKort ? (
-                  <p className={styles.resultInfo}>{drawResult.prize.omschrijvingKort}</p>
-                ) : null}
+                <PrizeReveal drawResult={drawResult} reducedMotion={reducedMotion} />
                 <button className={styles.button} type="button" onClick={handleReset}>
                   Voer nog een postcode in
                 </button>
