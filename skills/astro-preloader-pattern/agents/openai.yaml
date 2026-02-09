@@ -1,0 +1,3 @@
+interface:
+  display_name: "Astro Preloader Pattern"
+  short_description: "Document and standardize preloader logic for Astro/React"
