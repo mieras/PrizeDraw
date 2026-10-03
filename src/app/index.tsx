@@ -6,7 +6,6 @@ import type { MediaItem, PrizeManifestItem } from "~/src/infinite-canvas/types";
 import { PageLoader } from "~/src/loader";
 import { withRevealValues } from "~/src/prizes/reveal-values";
 import { useReducedMotion } from "~/src/use-reduced-motion";
-import { Confetti } from "./confetti";
 import { drawPrize, type DrawResult } from "./draw";
 import { PrizeReveal } from "./prize-reveal";
 import { TREKKING_OPTIONS, getTrekkingById } from "./trekking";
@@ -181,9 +180,13 @@ export function App() {
                     aria-invalid={!isPostalCodeValid && postalCodeInput.length > 0}
                     maxLength={8}
                   />
-                  <button className={`${styles.button} ${styles.buttonGhost}`} type="submit" disabled={!isPostalCodeValid}>
-                    Bekijk uitslag
-                  </button>
+                  <div className={`${styles.submitShell} ${isPostalCodeValid ? styles.submitShellActive : ""}`}>
+                    <span className={styles.submitBorderGlow} aria-hidden />
+                    <span className={styles.submitBorder} aria-hidden />
+                    <button className={`${styles.button} ${styles.submitButton}`} type="submit" disabled={!isPostalCodeValid}>
+                      Bekijk uitslag
+                    </button>
+                  </div>
                 </div>
               </div>
             </form>
@@ -213,8 +216,6 @@ export function App() {
           </section>
         )}
       </main>
-
-      {phase === "revealed" && !reducedMotion && <Confetti colorMode="gold" />}
     </>
   );
 }

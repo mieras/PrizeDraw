@@ -60,7 +60,7 @@
   flex-direction: column;
   align-items: stretch;
   gap: 18px;
-  width: min(100%, 28rem);
+  width: min(100%, 32rem);
 }
 
 .fieldGroup {
@@ -90,10 +90,14 @@
 .overviewSelect {
   width: 100%;
   height: calc(var(--ds-core--button--height--container) + 0.35rem);
-  padding: 0 1rem;
+  padding: 0 2.75rem 0 1.1rem;
   border-radius: var(--generic-corners-corner-radius-default);
   border: 1px solid rgba(255, 255, 255, 0.95);
-  background: rgba(255, 255, 255, 0.1);
+  background-color: rgba(255, 255, 255, 0.1);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16' fill='none'%3E%3Cpath d='M3.5 6L8 10.5L12.5 6' stroke='white' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1rem 1rem;
   color: #fff;
   font-family: inherit;
   font-size: 1.35rem;
@@ -103,6 +107,13 @@
   -webkit-backdrop-filter: blur(12px);
   cursor: pointer;
   outline: none;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.overviewSelect::-ms-expand {
+  display: none;
 }
 
 .overviewSelect option {
@@ -116,9 +127,11 @@
 
 .input {
   user-select: text;
-  flex: 0 0 auto;
-  width: 10ch;
+  flex: 0 1 auto;
+  width: 13ch;
+  min-width: 12ch;
   height: calc(var(--ds-core--button--height--container) + 0.35rem);
+  padding: 0 1.1rem;
   border-radius: var(--generic-corners-corner-radius-default);
   border: 1px solid rgba(255, 255, 255, 0.2);
   background: rgba(255, 255, 255, 0.08);
@@ -140,14 +153,92 @@
 }
 
 .formRow .button {
-  width: auto;
+  --shell-radius: 0.5rem;
+  --shell-inset: 2px;
+  --shell-inner-radius: calc(var(--shell-radius) - var(--shell-inset));
+
+  position: relative;
+  z-index: 1;
+  width: 100%;
   max-width: none;
-  flex: 1 1 auto;
-  min-width: 10rem;
   height: calc(var(--ds-core--button--height--container) + 0.35rem);
   padding: 0 1.25rem;
-  font-size: 1.15rem;
-  font-weight: 600;
+  border-radius: var(--shell-inner-radius);
+}
+
+.submitButton {
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.submitShell {
+  --shell-radius: 0.5rem;
+  --shell-inset: 2px;
+  --shell-inner-radius: calc(var(--shell-radius) - var(--shell-inset));
+
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 10rem;
+  padding: var(--shell-inset);
+  border-radius: var(--shell-radius);
+  isolation: isolate;
+}
+
+.submitBorder,
+.submitBorderGlow {
+  display: none;
+  position: absolute;
+  inset: 0;
+  border-radius: var(--shell-radius);
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.submitBorderGlow {
+  filter: blur(14px);
+  opacity: 0.9;
+}
+
+.submitBorder::before,
+.submitBorderGlow::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: -2;
+  width: 99999px;
+  height: 99999px;
+  transform: translate(-50%, -50%) rotate(0deg);
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-image: conic-gradient(rgba(255, 255, 255, 0), #fff 8%, rgba(255, 255, 255, 0) 28%);
+  animation: borderRotate 4s linear infinite;
+}
+
+.submitBorder::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: var(--shell-inset);
+  border-radius: var(--shell-inner-radius);
+  background: var(--button-fill-button-fill-primary);
+}
+
+.submitShellActive .submitBorder,
+.submitShellActive .submitBorderGlow {
+  display: block;
+}
+
+.submitShellActive:hover .submitBorder::after {
+  background: var(--button-fill-button-fill-primary-hover);
+}
+
+@keyframes borderRotate {
+  100% {
+    transform: translate(-50%, -50%) rotate(1turn);
+  }
 }
 
 /* Primary button: DS kleur, shadow en states (eigen CSS, design tokens) */
@@ -226,38 +317,6 @@
   box-shadow: none;
 }
 
-/* Ghost outline: wit op donkere/rode scene, naast formuliervelden */
-.buttonGhost {
-  border: 1px solid rgba(255, 255, 255, 0.95);
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
-  box-shadow: none;
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
-}
-
-.buttonGhost:hover {
-  background: rgba(255, 255, 255, 0.18);
-  border-color: #fff;
-  box-shadow: none;
-}
-
-.buttonGhost:active {
-  transform: none;
-  background: rgba(255, 255, 255, 0.22);
-  box-shadow: none;
-}
-
-.buttonGhost:disabled {
-  background: rgba(255, 255, 255, 0.06);
-  border-color: rgba(255, 255, 255, 0.35);
-  color: rgba(255, 255, 255, 0.45);
-  box-shadow: none;
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-}
-
 .loadingPanel,
 .resultPanel {
   text-align: center;
@@ -298,6 +357,8 @@
 }
 
 .resultImage {
+  position: relative;
+  z-index: 2;
   width: min(420px, 72%);
   max-height: min(62vh, 480px);
   object-fit: contain;
@@ -385,6 +446,11 @@
   align-items: center;
   height: 100vh;
   background: #f4f4f4;
+  overflow: hidden;
+}
+
+.mediaConfetti {
+  z-index: 1;
 }
 
 .revealImage {
@@ -461,17 +527,29 @@
 
 .aboutList {
   margin: 0;
-  padding-left: 1.15rem;
+  padding: 0;
+  list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 12px;
   color: #222;
   line-height: 1.45;
   font-size: var(--typography-font-sizes-body-font-size);
 }
 
-.aboutList li::marker {
-  color: #888;
+.aboutList li {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+}
+
+.checkIcon {
+  flex: 0 0 auto;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-top: 0.15rem;
+  color: var(--postcode-lottery-new-colors-green-500, #49a300);
+  stroke-width: 2.41;
 }
 
 .accountCta {
@@ -480,21 +558,36 @@
   text-decoration: none;
 }
 
-.resetLink {
+.dsLink {
   appearance: none;
   border: 0;
   background: transparent;
   padding: 0;
-  color: #555;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
   font: inherit;
-  font-size: 0.95rem;
-  text-decoration: underline;
-  text-underline-offset: 2px;
+  font-size: var(--typography-font-sizes-body-font-size);
+  font-weight: var(--ds-core--link--font-weight, 600);
+  line-height: var(--typography-line-height-body-compact-line-height);
+  color: var(--actions-text-colors-action-text-fill-default);
+  text-align: left;
+  text-decoration: none;
   cursor: pointer;
 }
 
-.resetLink:hover {
-  color: #111;
+.dsLink:hover {
+  color: var(--actions-text-colors-action-text-fill-hover, var(--postcode-lottery-new-colors-blue-700));
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.linkChevron {
+  width: 1.25rem;
+  height: 1.25rem;
+  flex: 0 0 auto;
+  stroke-width: 2.41;
 }
 
 :global(.revealWord) {
@@ -522,10 +615,13 @@
 
   .formRow .input {
     width: 100%;
+    min-width: 0;
   }
 
+  .submitShell,
   .formRow .button {
     width: 100%;
+    min-width: 0;
   }
 
   .prizeReveal {
@@ -598,8 +694,17 @@
   }
 
   .button,
-  .buttonInverted,
-  .buttonGhost {
+  .buttonInverted {
     transition: none;
+  }
+
+  .submitBorder::before,
+  .submitBorderGlow::before {
+    animation: none;
+  }
+
+  .submitShellActive .submitBorder,
+  .submitShellActive .submitBorderGlow {
+    display: none;
   }
 }

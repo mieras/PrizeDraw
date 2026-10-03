@@ -26,6 +26,37 @@ interface FallingRibbon {
   gradientColors: string[];
 }
 
+function createRibbon(
+  width: number,
+  height: number,
+  colorMode: ColorMode,
+  baseSize: number,
+  baseLength: number,
+  speedMult: number,
+  startAbove = true
+): FallingRibbon {
+  const gradientColors =
+    colorMode === "colorful"
+      ? COLOR_PAIRS[Math.floor(Math.random() * COLOR_PAIRS.length)]!
+      : GOLD;
+
+  return {
+    x: Math.random() * width,
+    y: startAbove
+      ? Math.random() * -height * 1.4 - baseLength * 2
+      : -(Math.random() * height * 0.35 + baseLength * 2),
+    size: baseSize * (0.5 + Math.random()),
+    length: baseLength * (0.5 + Math.random()),
+    speedY: (0.7 + Math.random() * 1.5) * speedMult,
+    speedX: (Math.random() - 0.5) * 0.9,
+    rotation: Math.random() * Math.PI * 2,
+    rotationSpeed: 0.03 + Math.random() * 0.05,
+    flip: 0,
+    flipSpeed: 0.08 + Math.random() * 0.08,
+    gradientColors: [...gradientColors],
+  };
+}
+
 function createFallingRibbons(
   width: number,
   height: number,
@@ -35,36 +66,32 @@ function createFallingRibbons(
   baseLength: number,
   speedMult: number
 ): FallingRibbon[] {
-  const ribbons: FallingRibbon[] = [];
-
-  for (let i = 0; i < amount; i++) {
-    const gradientColors =
-      colorMode === "colorful"
-        ? COLOR_PAIRS[Math.floor(Math.random() * COLOR_PAIRS.length)]!
-        : GOLD;
-
-    ribbons.push({
-      x: Math.random() * width,
-      y: Math.random() * -height - baseLength * 2,
-      size: baseSize * (0.5 + Math.random()),
-      length: baseLength * (0.5 + Math.random()),
-      speedY: (1 + Math.random() * 2) * speedMult,
-      speedX: (Math.random() - 0.5) * 1,
-      rotation: Math.random() * Math.PI * 2,
-      rotationSpeed: 0.03 + Math.random() * 0.05,
-      flip: 0,
-      flipSpeed: 0.08 + Math.random() * 0.08,
-      gradientColors: [...gradientColors],
-    });
-  }
-
-  return ribbons;
+  return Array.from({ length: amount }, () =>
+    createRibbon(width, height, colorMode, baseSize, baseLength, speedMult, true)
+  );
 }
 
-export function Confetti({ colorMode = "gold" }: { colorMode?: ColorMode }) {
+type ConfettiProps = {
+  colorMode?: ColorMode;
+  contained?: boolean;
+  className?: string;
+  /** Delay before the first ribbons start falling (ms). */
+  startDelayMs?: number;
+  /** Keep recycling ribbons until this duration after start (ms). */
+  durationMs?: number;
+};
+
+export function Confetti({
+  colorMode = "gold",
+  contained = false,
+  className,
+  startDelayMs = contained ? 900 : 0,
+  durationMs = contained ? 10000 : 4500,
+}: ConfettiProps) {
   const canvasRef = React.useRef<HTMLCanvasElement>(null);
   const ribbonsRef = React.useRef<FallingRibbon[]>([]);
   const rafRef = React.useRef<number>(0);
+  const startTimeoutRef = React.useRef<number>(0);
   const dimensionsRef = React.useRef({ w: 0, h: 0, wCss: 0, hCss: 0 });
 
   React.useEffect(() => {
@@ -85,23 +112,24 @@ export function Confetti({ colorMode = "gold" }: { colorMode?: ColorMode }) {
     };
 
     resize();
-    window.addEventListener("resize", resize);
 
-    const baseSize = 12;
-    const baseLength = 8;
-    const speedMult = 3;
-    const amount = 120;
+    const observer =
+      contained && canvas.parentElement
+        ? new ResizeObserver(() => {
+            resize();
+          })
+        : null;
 
-    const { wCss, hCss } = dimensionsRef.current;
-    ribbonsRef.current = createFallingRibbons(
-      wCss,
-      hCss,
-      amount,
-      colorMode,
-      baseSize,
-      baseLength,
-      speedMult
-    );
+    if (observer && canvas.parentElement) {
+      observer.observe(canvas.parentElement);
+    } else {
+      window.addEventListener("resize", resize);
+    }
+
+    const baseSize = contained ? 10 : 12;
+    const baseLength = contained ? 7 : 8;
+    const speedMult = contained ? 1.55 : 2.2;
+    const amount = contained ? 110 : 120;
 
     const drawRibbon = (r: FallingRibbon) => {
       ctx.save();
@@ -130,15 +158,26 @@ export function Confetti({ colorMode = "gold" }: { colorMode?: ColorMode }) {
       ctx.restore();
     };
 
-    const animate = () => {
-      const { w, h, hCss } = dimensionsRef.current;
+    let startedAt = 0;
+    let recycling = true;
+
+    const animate = (now: number) => {
+      if (!startedAt) {
+        startedAt = now;
+      }
+
+      const { w, h, wCss, hCss } = dimensionsRef.current;
       const dpr = window.devicePixelRatio ?? 1;
       ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, w, h);
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
+      if (now - startedAt >= durationMs) {
+        recycling = false;
+      }
+
       const ribbons = ribbonsRef.current;
-      let allBelow = true;
+      let visibleCount = 0;
 
       for (const r of ribbons) {
         r.y += r.speedY;
@@ -146,37 +185,73 @@ export function Confetti({ colorMode = "gold" }: { colorMode?: ColorMode }) {
         r.rotation += r.rotationSpeed;
         r.flip += r.flipSpeed;
 
-        if (r.y < hCss + r.length) {
-          allBelow = false;
-          drawRibbon(r);
+        if (r.y > hCss + r.length) {
+          if (recycling) {
+            const next = createRibbon(wCss, hCss, colorMode, baseSize, baseLength, speedMult, false);
+            Object.assign(r, next);
+            visibleCount += 1;
+            drawRibbon(r);
+          }
+          continue;
         }
+
+        visibleCount += 1;
+        drawRibbon(r);
       }
 
-      if (!allBelow) {
+      if (visibleCount > 0 || recycling) {
         rafRef.current = requestAnimationFrame(animate);
       }
     };
 
-    rafRef.current = requestAnimationFrame(animate);
+    startTimeoutRef.current = window.setTimeout(() => {
+      const { wCss, hCss } = dimensionsRef.current;
+      ribbonsRef.current = createFallingRibbons(
+        wCss,
+        hCss,
+        amount,
+        colorMode,
+        baseSize,
+        baseLength,
+        speedMult
+      );
+      rafRef.current = requestAnimationFrame(animate);
+    }, startDelayMs);
 
     return () => {
-      window.removeEventListener("resize", resize);
+      if (observer) {
+        observer.disconnect();
+      } else {
+        window.removeEventListener("resize", resize);
+      }
+      window.clearTimeout(startTimeoutRef.current);
       cancelAnimationFrame(rafRef.current);
     };
-  }, [colorMode]);
+  }, [colorMode, contained, durationMs, startDelayMs]);
 
   return (
     <canvas
       ref={canvasRef}
-      className="confetti-canvas"
-      style={{
-        position: "fixed",
-        inset: 0,
-        width: "100%",
-        height: "100%",
-        pointerEvents: "none",
-        zIndex: 5,
-      }}
+      className={className}
+      style={
+        contained
+          ? {
+              position: "absolute",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              pointerEvents: "none",
+              zIndex: 1,
+            }
+          : {
+              position: "fixed",
+              inset: 0,
+              width: "100%",
+              height: "100%",
+              pointerEvents: "none",
+              zIndex: 5,
+            }
+      }
       width={1}
       height={1}
       aria-hidden

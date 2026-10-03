@@ -1,6 +1,7 @@
 import * as React from "react";
 import { gsap } from "gsap";
 import { SplitText } from "gsap/SplitText";
+import { Confetti } from "./confetti";
 import type { DrawResult } from "./draw";
 import type { TrekkingOption } from "./trekking";
 import styles from "./style.module.css";
@@ -15,7 +16,6 @@ type PrizeRevealProps = {
 const MIN_VALUE = 0.5;
 const MAX_VALUE = 10;
 const MY_ACCOUNT_URL = "https://www.postcodeloterij.nl/topmenu/inloggen";
-const UITSLAGEN_URL = "https://www.postcodeloterij.nl/uitslagen";
 
 function clamp(value: number, min: number, max: number): number {
   return Math.max(min, Math.min(max, value));
@@ -45,7 +45,7 @@ function getAboutText(drawResult: DrawResult): string {
   return `Heb je ${drawResult.prizeLabel} gewonnen? Gefeliciteerd!`;
 }
 
-function getDetailBullets(drawResult: DrawResult): string[] {
+function getDetailBullets(drawResult: DrawResult, aboutText: string): string[] {
   const short =
     "omschrijvingKort" in drawResult.prize && drawResult.prize.omschrijvingKort
       ? drawResult.prize.omschrijvingKort
@@ -56,7 +56,7 @@ function getDetailBullets(drawResult: DrawResult): string[] {
       : "";
 
   const bullets: string[] = [];
-  if (short) {
+  if (short && short !== aboutText) {
     bullets.push(short);
   }
   if (full && full.toLowerCase() !== short.toLowerCase() && full.length > 8) {
@@ -78,10 +78,26 @@ function getPrizeValueLabel(drawResult: DrawResult): string | null {
   return match?.[0]?.replace(/\s+/g, " ") ?? null;
 }
 
+function CheckIcon() {
+  return (
+    <svg className={styles.checkIcon} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M20 6L9 17L4 12" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    </svg>
+  );
+}
+
+function ChevronRightIcon() {
+  return (
+    <svg className={styles.linkChevron} viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <path d="M9 18L15 12L9 6" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+    </svg>
+  );
+}
+
 export function PrizeReveal({ drawResult, trekking, reducedMotion, onReset }: PrizeRevealProps) {
   const title = getPrizeTitle(drawResult);
   const aboutText = getAboutText(drawResult);
-  const detailBullets = getDetailBullets(drawResult);
+  const detailBullets = getDetailBullets(drawResult, aboutText);
   const prizeValueLabel = getPrizeValueLabel(drawResult);
   const normalizedValue = clamp((drawResult.revealValue - MIN_VALUE) / (MAX_VALUE - MIN_VALUE), 0, 1);
 
@@ -226,25 +242,22 @@ export function PrizeReveal({ drawResult, trekking, reducedMotion, onReset }: Pr
               {detailBullets.length > 0 ? (
                 <ul className={styles.aboutList}>
                   {detailBullets.map((bullet) => (
-                    <li key={bullet.slice(0, 48)}>{bullet}</li>
+                    <li key={bullet.slice(0, 48)}>
+                      <CheckIcon />
+                      <span>{bullet}</span>
+                    </li>
                   ))}
                 </ul>
               ) : null}
-              <p className={styles.resultInfo}>
-                Meer info op de{" "}
-                <a className={styles.inlineLink} href={UITSLAGEN_URL} target="_blank" rel="noreferrer">
-                  uitslagenpagina
-                </a>
-                .
-              </p>
             </div>
 
             <div className={styles.resultActions}>
               <a className={`${styles.button} ${styles.accountCta}`} href={MY_ACCOUNT_URL} target="_blank" rel="noreferrer">
                 Log in op Mijn Postcode Loterij
               </a>
-              <button className={styles.resetLink} type="button" onClick={onReset}>
+              <button className={styles.dsLink} type="button" onClick={onReset}>
                 Andere postcode
+                <ChevronRightIcon />
               </button>
             </div>
           </div>
@@ -252,6 +265,7 @@ export function PrizeReveal({ drawResult, trekking, reducedMotion, onReset }: Pr
       </div>
 
       <div className={styles.prizeRevealMedia}>
+        {!reducedMotion && <Confetti colorMode="colorful" contained className={styles.mediaConfetti} />}
         <img
           ref={imageRef}
           className={`${styles.resultImage} ${styles.revealImage}`}
