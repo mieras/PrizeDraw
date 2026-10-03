@@ -10,6 +10,13 @@
   user-select: none;
 }
 
+.overlaySplit {
+  display: block;
+  padding: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
+
 .sceneFade {
   position: fixed;
   inset: 0;
@@ -24,10 +31,6 @@
 .resultPanel {
   pointer-events: auto;
   width: min(520px, 100%);
-  
-  /* background: rgba(10, 10, 10, 0.58); */
-  /* border: 1px solid rgba(255, 255, 255, 0.15); */
-  /* backdrop-filter: blur(18px); */
   color: #fff;
   padding: clamp(24px, 4vw, 42px);
   text-align: center;
@@ -54,32 +57,75 @@
 .form {
   margin-top: 30px;
   display: flex;
-  align-items: center;
   flex-direction: column;
-  gap: 14px;
-  max-width: 256px;
+  align-items: stretch;
+  gap: 18px;
+  width: min(100%, 28rem);
+}
+
+.fieldGroup {
   display: flex;
   flex-direction: column;
+  align-items: stretch;
+  gap: 10px;
+}
 
+.formRow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
 }
 
 .inputLabel {
-  font-size: 1rem;
+  font-size: 1.05rem;
+  font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.92);
+  text-align: left;
+}
+
+.overviewSelect {
+  width: 100%;
+  height: calc(var(--ds-core--button--height--container) + 0.35rem);
+  padding: 0 1rem;
+  border-radius: var(--generic-corners-corner-radius-default);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-family: inherit;
+  font-size: 1.35rem;
+  font-weight: 600;
+  line-height: 1.2;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  cursor: pointer;
+  outline: none;
+}
+
+.overviewSelect option {
+  color: #111;
+  background: #fff;
+}
+
+.overviewSelect:focus {
+  border-color: #fff;
 }
 
 .input {
   user-select: text;
+  flex: 0 0 auto;
   width: 10ch;
-  height: var(--ds-core--button--height--container);
+  height: calc(var(--ds-core--button--height--container) + 0.35rem);
   border-radius: var(--generic-corners-corner-radius-default);
   border: 1px solid rgba(255, 255, 255, 0.2);
   background: rgba(255, 255, 255, 0.08);
   color: #fff;
   text-align: center;
   font-size: clamp(1.5rem, 5vw, 2rem);
+  font-weight: 600;
   letter-spacing: 0.08em;
   font-family: "Azeret Mono", monospace;
   outline: none;
@@ -92,8 +138,16 @@
 .input::placeholder {
   color: rgba(255, 255, 255, 0.4);
 }
-.form .button {
-  /* width: fit-content; */
+
+.formRow .button {
+  width: auto;
+  max-width: none;
+  flex: 1 1 auto;
+  min-width: 10rem;
+  height: calc(var(--ds-core--button--height--container) + 0.35rem);
+  padding: 0 1.25rem;
+  font-size: 1.15rem;
+  font-weight: 600;
 }
 
 /* Primary button: DS kleur, shadow en states (eigen CSS, design tokens) */
@@ -172,6 +226,38 @@
   box-shadow: none;
 }
 
+/* Ghost outline: wit op donkere/rode scene, naast formuliervelden */
+.buttonGhost {
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+  box-shadow: none;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.1s ease;
+}
+
+.buttonGhost:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: #fff;
+  box-shadow: none;
+}
+
+.buttonGhost:active {
+  transform: none;
+  background: rgba(255, 255, 255, 0.22);
+  box-shadow: none;
+}
+
+.buttonGhost:disabled {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.45);
+  box-shadow: none;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
 .loadingPanel,
 .resultPanel {
   text-align: center;
@@ -182,47 +268,63 @@
   font-size: 1rem;
 }
 
-.resultPanel h2 {
-  margin: 0 0 1rem 0;
-  font-size: clamp(1.5rem, 14vw, 2.5rem);
-  text-wrap: pretty;
+.resultPanel {
+  width: 100%;
+  min-height: 100%;
+  height: auto;
+  max-height: none;
+  padding: 0;
+  overflow: visible;
+  color: #111;
+}
+
+.resultEyebrow {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #666;
 }
 
 .resultMetaRow {
   display: flex;
-  justify-content: space-between;
+  flex-wrap: wrap;
+  justify-content: flex-start;
   align-items: center;
-  width: min(340px, 100%);
-  margin: 0 auto 12px;
+  gap: 12px 20px;
+  width: 100%;
+  margin: 0;
 }
 
 .resultImage {
-  width: min(340px, 100%);
-  /* aspect-ratio: 400 / 300; */
-  max-height: 20vh;
+  width: min(420px, 72%);
+  max-height: min(62vh, 480px);
   object-fit: contain;
-  border-radius: 20px;
 }
 
 .resultPrize {
-  margin: 16px 0 0;
-  font-size: 3rem;
-  
+  margin: 0;
+  font-size: clamp(2rem, 4.5vw, 3.25rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  text-align: left;
+  color: #111;
 }
 
 .resultInfo {
   margin: 0;
-  color: #000;
+  color: #222;
   line-height: 150%;
   font-size: var(--typography-font-sizes-body-font-size);
-  margin-top: 1rem;
+  text-align: left;
 }
 
 .resultMeta {
   margin: 0;
-  color: #000;
+  color: #2a2a2a;
   line-height: 150%;
-  font-size: var(--typography-font-sizes-body-font-size);
+  font-size: 0.95rem;
 }
 
 .mono {
@@ -230,15 +332,59 @@
   letter-spacing: 0.04em;
 }
 
-.resultPanel .button {
-  margin-top: 24px;
-  width: min(340px, 100%);
+.resultActions {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 14px;
+  margin-top: 8px;
+  width: 100%;
+}
+
+.resultPanel .button,
+.resultActions .button {
+  margin-top: 0;
+  width: auto;
+  min-width: 12rem;
+  max-width: 100%;
 }
 
 .prizeReveal {
-  width: min(340px, 100%);
+  width: 100%;
+  min-height: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: start;
+  text-align: left;
   --reveal-image-blur: 12px;
   --reveal-image-scale: 1.16;
+}
+
+.prizeRevealCopy {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  min-width: 0;
+  background: #fff;
+}
+
+.prizeRevealCopyInner {
+  width: 80%;
+  max-width: 640px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: clamp(32px, 5vw, 72px) 0;
+}
+
+.prizeRevealMedia {
+  position: sticky;
+  top: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background: #f4f4f4;
 }
 
 .revealImage {
@@ -259,6 +405,96 @@
 .revealDescription {
   opacity: 0;
   transform: translateY(10px);
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.inlineLink {
+  color: var(--postcode-lottery-colors-blue-600, #005ebb);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.inlineLink:hover {
+  color: var(--postcode-lottery-colors-blue-700, #004a96);
+}
+
+.trekkingMeta {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px 20px;
+  margin: 0;
+  padding: 14px 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.trekkingMeta dt {
+  margin: 0 0 2px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #666;
+}
+
+.trekkingMeta dd {
+  margin: 0;
+  color: #111;
+  font-size: 0.98rem;
+  line-height: 1.4;
+}
+
+.aboutBlock {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.aboutTitle {
+  margin: 0;
+  font-size: 1.15rem;
+  line-height: 1.2;
+  color: #111;
+}
+
+.aboutList {
+  margin: 0;
+  padding-left: 1.15rem;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: #222;
+  line-height: 1.45;
+  font-size: var(--typography-font-sizes-body-font-size);
+}
+
+.aboutList li::marker {
+  color: #888;
+}
+
+.accountCta {
+  width: fit-content;
+  max-width: 100%;
+  text-decoration: none;
+}
+
+.resetLink {
+  appearance: none;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  color: #555;
+  font: inherit;
+  font-size: 0.95rem;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.resetLink:hover {
+  color: #111;
 }
 
 :global(.revealWord) {
@@ -275,12 +511,54 @@
   border: 0;
   backdrop-filter: none;
   color: #111;
-  text-align: center;
+  text-align: left;
 }
 
+@media (max-width: 860px) {
+  .formRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
 
-.resultPlain .resultMeta {
-  color: #2a2a2a;
+  .formRow .input {
+    width: 100%;
+  }
+
+  .formRow .button {
+    width: 100%;
+  }
+
+  .prizeReveal {
+    grid-template-columns: 1fr;
+  }
+
+  .prizeRevealCopy {
+    order: 2;
+  }
+
+  .prizeRevealCopyInner {
+    width: min(92%, 640px);
+    padding-inline: 0;
+  }
+
+  .prizeRevealMedia {
+    order: 1;
+    position: relative;
+    top: auto;
+    height: 42vh;
+  }
+
+  .resultImage {
+    max-height: 34vh;
+  }
+
+  .trekkingMeta {
+    grid-template-columns: 1fr;
+  }
+
+  .accountCta {
+    width: 100%;
+  }
 }
 
 @keyframes fadeIn {
@@ -320,7 +598,8 @@
   }
 
   .button,
-  .buttonInverted {
+  .buttonInverted,
+  .buttonGhost {
     transition: none;
   }
 }

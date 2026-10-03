@@ -1,5 +1,6 @@
 import * as React from "react";
 import { createRoot } from "react-dom/client";
+import "~/src/fonts.css";
 import "~/src/index.css";
 import "~/src/brand-variables.css";
 import { App } from "~/src/app";
