@@ -1,0 +1,143 @@
+@font-face {
+  font-family: "Postcode Lottery";
+  src: url("./assets/fonts/PostcodeLottery-Thin.otf") format("opentype");
+  font-weight: 100;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Postcode Lottery";
+  src: url("./assets/fonts/PostcodeLottery-ThinItalic.otf") format("opentype");
+  font-weight: 100;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Postcode Lottery";
+  src: url("./assets/fonts/PostcodeLottery-ExtraLight.otf") format("opentype");
+  font-weight: 200;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Postcode Lottery";
+  src: url("./assets/fonts/PostcodeLottery-ExtLtIta.otf") format("opentype");
+  font-weight: 200;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Postcode Lottery";
+  src: url("./assets/fonts/PostcodeLottery-Light.otf") format("opentype");
+  font-weight: 300;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Postcode Lottery";
+  src: url("./assets/fonts/PostcodeLottery-LightItalic.otf") format("opentype");
+  font-weight: 300;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Postcode Lottery";
+  src: url("./assets/fonts/PostcodeLottery-Regular.otf") format("opentype");
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Postcode Lottery";
+  src: url("./assets/fonts/PostcodeLottery-RegularItalic.otf") format("opentype");
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Postcode Lottery";
+  src: url("./assets/fonts/PostcodeLottery-Medium.otf") format("opentype");
+  font-weight: 500;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Postcode Lottery";
+  src: url("./assets/fonts/PostcodeLottery-MediumItalic.otf") format("opentype");
+  font-weight: 500;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Postcode Lottery";
+  src: url("./assets/fonts/PostcodeLottery-SemiBold.otf") format("opentype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Postcode Lottery";
+  src: url("./assets/fonts/PostcodeLottery-SemBdIta.otf") format("opentype");
+  font-weight: 600;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Postcode Lottery";
+  src: url("./assets/fonts/PostcodeLottery-Bold.otf") format("opentype");
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Postcode Lottery";
+  src: url("./assets/fonts/PostcodeLottery-BoldItalic.otf") format("opentype");
+  font-weight: 700;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Postcode Lottery";
+  src: url("./assets/fonts/PostcodeLottery-ExtraBold.otf") format("opentype");
+  font-weight: 800;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Postcode Lottery";
+  src: url("./assets/fonts/PostcodeLottery-ExtBdIta.otf") format("opentype");
+  font-weight: 800;
+  font-style: italic;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Postcode Lottery";
+  src: url("./assets/fonts/PostcodeLottery-Black.otf") format("opentype");
+  font-weight: 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Postcode Lottery";
+  src: url("./assets/fonts/PostcodeLottery-BlackItalic.otf") format("opentype");
+  font-weight: 900;
+  font-style: italic;
+  font-display: swap;
+}

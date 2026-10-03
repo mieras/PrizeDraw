@@ -97,7 +97,7 @@
   --postcode-lottery-typography-font-weight-700: Bold;
   --postcode-lottery-typography-font-weight-800: Black;
   --postcode-lottery-typography-font-weight-800-condensed: Black Condensed;
-  --postcode-lottery-typography-primary-font: Myriad Pro;
+  --postcode-lottery-typography-primary-font: "Postcode Lottery";
 
   /* ---- Effects ---- */
   --actions-effects-shadow-color: var(--postcode-lottery-colors-black-16-percent);
@@ -491,7 +491,7 @@
   --ds-core--typography--font-weight--body: 400;
   --ds-core--typography--font-weight--strong: 700;
   --ds-core--typography--font-weight--small: 400;
-  --ds-core--typography--font-family--decorative: "Myriad Pro Condensed";
+  --ds-core--typography--font-family--decorative: "Postcode Lottery";
   --ds-core--typography--text-transform--decorative: uppercase;
   --ds-core--label--text-transform: none;
   --ds-core--label--font-weight: 600;

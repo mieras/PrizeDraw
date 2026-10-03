@@ -9,6 +9,7 @@ import { useReducedMotion } from "~/src/use-reduced-motion";
 import { Confetti } from "./confetti";
 import { drawPrize, type DrawResult } from "./draw";
 import { PrizeReveal } from "./prize-reveal";
+import { TREKKING_OPTIONS, getTrekkingById } from "./trekking";
 import styles from "./style.module.css";
 
 /** Switch: true = prizes (CSV), false = artworks */
@@ -48,9 +49,11 @@ export function App() {
 
   const [phase, setPhase] = React.useState<Phase>("idle");
   const [postalCodeInput, setPostalCodeInput] = React.useState("");
+  const [selectedTrekkingId, setSelectedTrekkingId] = React.useState(TREKKING_OPTIONS[0]?.id ?? "");
   const [drawResult, setDrawResult] = React.useState<DrawResult | null>(null);
   const [animationProgress, setAnimationProgress] = React.useState(0);
 
+  const selectedTrekking = getTrekkingById(selectedTrekkingId);
   const isPostalCodeValid = POSTAL_CODE_PATTERN.test(postalCodeInput);
   const sceneFadeOpacity = reducedMotion
     ? phase === "revealed"
@@ -133,67 +136,85 @@ export function App() {
         fogNear={20}
         fogFar={320}
       />
-      <div className={styles.sceneFade} style={{ opacity: sceneFadeOpacity }} />
+      <div className={styles.sceneFade} style={{ opacity: sceneFadeOpacity }} aria-hidden />
 
-      <main className={styles.overlay}>
+      <main className={`${styles.overlay} ${phase === "revealed" ? styles.overlaySplit : ""}`}>
         {phase === "idle" && (
           <section className={styles.panel}>
             <h1 className={styles.title}>Behoor jij tot de winnaars?</h1>
             <p className={styles.subtitle}>Elke 1e van de maand maken we de uitslagen bekend.</p>
 
             <form className={styles.form} onSubmit={handleSubmit}>
-              <label className={styles.inputLabel} htmlFor="postalCodeInput">
-                Vul je postcode in
-              </label>
-              <input
-                id="postalCodeInput"
-                className={styles.input}
-                value={postalCodeInput}
-                onChange={(event) => setPostalCodeInput(sanitizePostalCode(event.target.value))}
-                placeholder="1234AB"
-                autoComplete="postal-code"
-                autoFocus
-                inputMode="text"
-                spellCheck={false}
-                aria-invalid={!isPostalCodeValid && postalCodeInput.length > 0}
-                maxLength={8}
-              />
-              <button className={`${styles.button} ${styles.buttonInverted}`} type="submit" disabled={!isPostalCodeValid}>
-                Bekijk uitslag
-              </button>
+              <div className={styles.fieldGroup}>
+                <label className={styles.inputLabel} htmlFor="trekkingSelect">
+                  Trekking
+                </label>
+                <select
+                  id="trekkingSelect"
+                  className={styles.overviewSelect}
+                  value={selectedTrekkingId}
+                  onChange={(event) => setSelectedTrekkingId(event.target.value)}
+                >
+                  {TREKKING_OPTIONS.map((option) => (
+                    <option key={option.id} value={option.id}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className={styles.fieldGroup}>
+                <label className={styles.inputLabel} htmlFor="postalCodeInput">
+                  Vul je postcode in
+                </label>
+                <div className={styles.formRow}>
+                  <input
+                    id="postalCodeInput"
+                    className={styles.input}
+                    value={postalCodeInput}
+                    onChange={(event) => setPostalCodeInput(sanitizePostalCode(event.target.value))}
+                    placeholder="1234AB"
+                    autoComplete="postal-code"
+                    autoFocus
+                    inputMode="text"
+                    spellCheck={false}
+                    aria-invalid={!isPostalCodeValid && postalCodeInput.length > 0}
+                    maxLength={8}
+                  />
+                  <button className={`${styles.button} ${styles.buttonGhost}`} type="submit" disabled={!isPostalCodeValid}>
+                    Bekijk uitslag
+                  </button>
+                </div>
+              </div>
             </form>
           </section>
         )}
 
         {phase === "animating" && (
           <section className={styles.loadingPanel} aria-live="polite">
-            <p>Moment, wij zoeken {postalCodeInput.length === 6 ? `${postalCodeInput.slice(0, 4)} ${postalCodeInput.slice(4)}` : postalCodeInput} tussen de winnaars</p>
+            <p>
+              Moment, wij zoeken{" "}
+              {postalCodeInput.length === 6
+                ? `${postalCodeInput.slice(0, 4)} ${postalCodeInput.slice(4)}`
+                : postalCodeInput}{" "}
+              in {selectedTrekking.label}
+            </p>
           </section>
         )}
 
-        {phase === "revealed" && (
-          <>
-            {!reducedMotion && <Confetti colorMode="gold" />}
-            {drawResult && (
-              <section className={`${styles.resultPanel} ${styles.resultPlain}`} aria-live="polite">
-                <h2>Jouw prijs</h2>
-                <div className={styles.resultMetaRow}>
-                  <p className={styles.resultMeta}>
-                    Postcode: <span className={styles.mono}>{drawResult.postalCode}</span>
-                  </p>
-                  <p className={styles.resultMeta}>
-                    Ticketnummer: <span className={styles.mono}>{drawResult.ticketNumber}</span>
-                  </p>
-                </div>
-                <PrizeReveal drawResult={drawResult} reducedMotion={reducedMotion} />
-                <button className={styles.button} type="button" onClick={handleReset}>
-                  Voer nog een postcode in
-                </button>
-              </section>
-            )}
-          </>
+        {phase === "revealed" && drawResult && (
+          <section className={`${styles.resultPanel} ${styles.resultPlain}`} aria-live="polite">
+            <PrizeReveal
+              drawResult={drawResult}
+              trekking={selectedTrekking}
+              reducedMotion={reducedMotion}
+              onReset={handleReset}
+            />
+          </section>
         )}
       </main>
+
+      {phase === "revealed" && !reducedMotion && <Confetti colorMode="gold" />}
     </>
   );
 }
